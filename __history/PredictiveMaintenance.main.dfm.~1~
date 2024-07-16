@@ -1,7 +1,7 @@
-object frmPredictiveMaintenance: TfrmPredictiveMaintenance
+object Form2: TForm2
   Left = 0
   Top = 0
-  Caption = 'Predictive Maintenance'
+  Caption = 'Form2'
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace

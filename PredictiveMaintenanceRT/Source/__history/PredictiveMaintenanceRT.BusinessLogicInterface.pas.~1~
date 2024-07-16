@@ -1,0 +1,7 @@
+unit PredictiveMaintenanceRT.BusinessLogicInterface;
+
+interface
+
+implementation
+
+end.

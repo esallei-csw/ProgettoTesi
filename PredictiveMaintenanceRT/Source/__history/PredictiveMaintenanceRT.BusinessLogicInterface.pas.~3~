@@ -1,0 +1,13 @@
+unit PredictiveMaintenanceRT.BusinessLogicInterface;
+
+interface
+
+type
+  IPredictiveMaintenance = interface
+
+    //procedures and functions
+  end;
+
+implementation
+
+end.

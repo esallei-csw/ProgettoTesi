@@ -7,7 +7,7 @@ uses
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs;
 
 type
-  TfrmPredictiveMaintenance = class(TForm)
+  TForm2 = class(TForm)
   private
     { Private declarations }
   public
@@ -15,7 +15,7 @@ type
   end;
 
 var
-  frmPredictiveMaintenance: TfrmPredictiveMaintenance;
+  Form2: TForm2;
 
 implementation
 

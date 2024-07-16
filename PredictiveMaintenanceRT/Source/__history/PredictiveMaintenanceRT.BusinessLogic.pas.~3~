@@ -1,0 +1,19 @@
+unit PredictiveMaintenanceRT.BusinessLogic;
+
+interface
+
+uses
+  PredictiveMaintenanceRT.BusinessLogicInterface;
+
+type
+  TPredictiveMaintenance = class(TInterfacedObject, IPredictiveMaintenance)
+
+  private
+
+  public
+
+  end;
+
+implementation
+
+end.
