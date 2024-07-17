@@ -1,0 +1,48 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{EA4E0265-2ED6-45CE-8E08-2CCF0B803662}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="PredictiveMaintenance.dproj">
+            <Dependencies>..\..\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj</Dependencies>
+        </Projects>
+        <Projects Include="..\..\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="PredictiveMaintenance" DependsOnTargets="PredictiveMaintenanceRT">
+        <MSBuild Projects="PredictiveMaintenance.dproj"/>
+    </Target>
+    <Target Name="PredictiveMaintenance:Clean" DependsOnTargets="PredictiveMaintenanceRT:Clean">
+        <MSBuild Projects="PredictiveMaintenance.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PredictiveMaintenance:Make" DependsOnTargets="PredictiveMaintenanceRT:Make">
+        <MSBuild Projects="PredictiveMaintenance.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="PredictiveMaintenanceRT">
+        <MSBuild Projects="..\..\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj"/>
+    </Target>
+    <Target Name="PredictiveMaintenanceRT:Clean">
+        <MSBuild Projects="..\..\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PredictiveMaintenanceRT:Make">
+        <MSBuild Projects="..\..\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="PredictiveMaintenance;PredictiveMaintenanceRT"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="PredictiveMaintenance:Clean;PredictiveMaintenanceRT:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="PredictiveMaintenance:Make;PredictiveMaintenanceRT:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>

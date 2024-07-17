@@ -1,0 +1,16 @@
+unit PredictiveMaintenanceRT.CellDataModel;
+
+interface
+
+type
+  TDataModel = class
+    private
+    FCellId: integer;
+
+    public
+
+  end;
+
+implementation
+
+end.

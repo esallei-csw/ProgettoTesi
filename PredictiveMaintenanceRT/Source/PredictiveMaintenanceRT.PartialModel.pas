@@ -1,0 +1,39 @@
+unit PredictiveMaintenanceRT.PartialModel;
+
+interface
+
+type
+  TPartialModel = class
+  private
+    FPartialId: integer;
+    FCellId: integer;
+    FStartTime: Extended;
+    FEndTime: Extended;
+    FWorkHours: Extended;
+    FQuantity: Extended;
+  public
+    constructor Create;
+
+    property PartialId: integer read FPartialId write FPartialId;
+    property CellId: integer read FCellId write FCellId;
+    property StartTime: Extended read FStartTime write FStartTime;
+    property EndTime: Extended read FEndTime write FEndTime;
+    property WorkHours: Extended read FWorkHours write FWorkHours;
+    property Quantity: Extended read FQuantity write FQuantity;
+  end;
+
+implementation
+
+{ TPartial }
+
+constructor TPartialModel.Create;
+begin
+  FPartialId := varEmpty;
+  FCellId := varEmpty;
+  FStartTime := varEmpty;
+  FEndTime := varEmpty;
+  FWorkHours := varEmpty;
+  FQuantity := varEmpty;
+end;
+
+end.

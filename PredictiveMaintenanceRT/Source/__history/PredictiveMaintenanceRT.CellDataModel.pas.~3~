@@ -1,0 +1,24 @@
+unit PredictiveMaintenanceRT.CellDataModel;
+
+interface
+
+type
+  TCellDataModel = class
+    private
+    {Private declarations}
+    FCellId: integer;
+
+    FDaysToMaintenance: Extended;
+
+
+    public
+    {Public declarations}
+    property CellId: integer read FCellId write FCellId;
+    property DaysToMaintenance: Extended read FDaysToMaintenance write FDaysToMaintenance;
+
+
+  end;
+
+implementation
+
+end.

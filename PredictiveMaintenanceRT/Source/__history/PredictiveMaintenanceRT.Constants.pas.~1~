@@ -1,0 +1,10 @@
+unit PredictiveMaintenanceRT.Constants;
+
+interface
+
+const
+  WORK_HOURS_IN_A_DAY = 8;
+
+implementation
+
+end.
