@@ -37,11 +37,8 @@ uses
   PredictiveMaintenanceRT.Constants;
 
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
-var
-  LDate: TDateTime;
 begin
-  LDate := FloatToDateTime(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
-  edtMaintenanceDate.Text := DateTimeToStr(LDate);
+  edtMaintenanceDate.Text := floattostr(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
 end;
 
 procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);

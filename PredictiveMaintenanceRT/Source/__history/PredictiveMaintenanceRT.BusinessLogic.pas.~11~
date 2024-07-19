@@ -28,6 +28,8 @@ type
 
 
     function GetCellModel(ACellId: integer): TCellDataModel;
+    function PopulateCellModel(ACell: TCellDataModel): TCellDataModel;
+    function DataSetToList(ADataSet: TADOQuery): TList<TPartialModel>;
   public
     {Public declarations}
     function GetMaintenanceDate(ACellId: integer): Extended;
@@ -59,11 +61,51 @@ begin
   Result := FQueryExecutor;
 end;
 
-function TPredictiveMaintenance.GetQueryHandler: TQueryHandler;
+function TPredictiveMaintenance.PopulateCellModel(ACell: TCellDataModel): TCellDataModel;
+var
+  LData: TADOQuery;
 begin
-  if not Assigned(FQueryHandler) then
-    FQueryHandler := TQueryHandler.Create;
-  Result:= FQueryHandler;
+  try
+    LData := QueryExecutor.ExecuteQuery(Format(QUERY_PARTIALS, [intToStr(ACell.CellId)]));
+    if LData <> nil then
+      ACell.Partials := DataSetToList(LData)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+    Result := ACell;
+  finally
+    LData.Free;
+  end;
+
+end;
+
+function TPredictiveMaintenance.DataSetToList(
+  ADataSet: TADOQuery): TList<TPartialModel>;
+var
+  LPartials: TList<TPartialModel>;
+  LPartial: TPartialModel;
+begin
+  LPartials := TList<TPartialModel>.Create;
+  LPartial := TPartialModel.Create;
+  try
+    if not ADataSet.Active then
+      raise Exception.Create(DATASET_CLOSED);
+    ADataSet.First;
+    while not ADataSet.Eof do
+    begin
+      LPartial.PartialId := ADataSet.FieldByName(PARTIAL_ID).AsInteger;
+      LPartial.CellId := ADataSet.FieldByName(PARTIAL_CELLID).AsInteger;
+      LPartial.StartTime := ADataSet.FieldByName(PARTIAL_START).AsFloat;
+      LPartial.WorkHours := ADataSet.FieldByName(PARTIAL_WORKHOURS).AsFloat;
+      LPartial.EndTime := ADataSet.FieldByName(PARTIAL_END).AsFloat;
+      LPartial.Quantity := ADataSet.FieldByName(PARTIAL_QUANTITY).AsFloat;
+      LPartials.Add(LPartial);
+      ADataSet.Next;
+    end;
+    Result := LPartials;
+  finally
+//    LPartials.Free;
+    LPartial.Free;
+  end;
 end;
 
 function TPredictiveMaintenance.GetCellModel(
@@ -75,7 +117,7 @@ begin
   LCellModel.CellId := ACellId;
   LCellModel.ThresholdPieces := 500;
   //funzione che popola i dati del modello tramite querySQL
-  LCellModel := QueryHandler.PopulateCellModel(LCellModel);
+  LCellModel := PopulateCellModel(LCellModel);
   Result := LCellModel;
 end;
 

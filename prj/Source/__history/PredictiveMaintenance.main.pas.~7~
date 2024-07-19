@@ -38,7 +38,7 @@ uses
 
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
 var
-  LDate: TDateTime;
+  LDate: TDate;
 begin
   LDate := FloatToDateTime(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
   edtMaintenanceDate.Text := DateTimeToStr(LDate);

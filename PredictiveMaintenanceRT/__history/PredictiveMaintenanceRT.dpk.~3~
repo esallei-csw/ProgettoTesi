@@ -46,8 +46,7 @@ contains
   PredictiveMaintenanceRT.Constants in 'Source\PredictiveMaintenanceRT.Constants.pas',
   PredictiveMaintenanceRT.Messages in 'Source\PredictiveMaintenanceRT.Messages.pas',
   PredictiveMaintenanceRT.CellDataModel in 'Source\PredictiveMaintenanceRT.CellDataModel.pas',
-  PredictiveMaintenanceRT.PartialModel in 'Source\PredictiveMaintenanceRT.PartialModel.pas',
-  PredictiveMaintenanceRT.QueryHandler in 'Source\PredictiveMaintenanceRT.QueryHandler.pas';
+  PredictiveMaintenanceRT.PartialModel in 'Source\PredictiveMaintenanceRT.PartialModel.pas';
 
 end.
 

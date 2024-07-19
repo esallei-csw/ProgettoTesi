@@ -3,7 +3,7 @@ unit PredictiveMaintenanceRT.PredictiveAlgorithm;
 interface
 
 uses
-  PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel, System.Generics.Collections;
+  PredictiveMaintenanceRT.CellDataModel;
 
 type
   TPredictiveAlgorithm = class
@@ -11,7 +11,10 @@ type
   private
     {Private declarations}
 
-    function GetTotalPiecesMade(APartials: TList<TPartialModel>): Extended;
+    function WorkTimeToDays(AHours: Extended): Extended;
+
+    function PiecesDay(Apieces: Extended): Extended;
+
   public
     {Public declarations}
 
@@ -21,7 +24,7 @@ type
 implementation
 
 uses
-  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.PartialModel;
+  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
 
 { TPredictiveAlgorithm }
 
@@ -36,7 +39,7 @@ var
   LTotalPiecesMade: Extended;
   I: integer;
 begin
-  LTotalPiecesMade := 0;
+
   //convertire FWorkTimeToNextMaintenance in giorni di lavoro calcolando che la macchina lavorerà teoricamente
   //8 ore al giorno e solo 5 giorni alla settimana quindi fare un calcolo che ritorna una data nel futuro
 
@@ -60,15 +63,17 @@ begin
   //dati sommati dai parziali 15+10+3
 
   //calcolo i pezzi totali fatti prendendoli dai parziali di una cella di lavoro
-
-  LTotalPiecesMade := GetTotalPiecesMade(ACell.Partials);
+  for I := 0 to Length(ACell.Partials) do
+  begin
+    LTotalPiecesMade := LTotalPiecesMade + ACell.Partials[I].Quantity;
+  end;
 
   LPiecesToNextMaintenance := ACell.ThresholdPieces - LTotalPiecesMade;
 
   //pezzi all ora := pezzi prodotti / ore impiegate (dati che vengono presi da un parziale)
   //in questo caso vengono presi dal primo parziale per comodità
   //sarebbe meglio prenderli dall ultimo che dovrebbe essere quello più corretto ed aggiornato
-  LPiecesAnHour := ACell.Partials[1].Quantity / ACell.Partials[1].WorkHours;
+  LPiecesAnHour := ACell.Partials[0].Quantity / ACell.Partials[0].WorkHours;
 
   //ore di lavoro per produrre x pezzi := xpezzi / pezzi all ora
   LHoursToMakeXPieces := LPiecesToNextMaintenance / LPiecesAnHour;
@@ -79,7 +84,7 @@ begin
 
   //trovare a questo punto i pezzi prodotti in una giornata di lavoro:
   //pezzi prodotti in un ora * 8 := pezzi prodotti in un giorno(8 ore)
-  LPiecesADay := LPiecesMadeInAnHour * WORK_HOURS_IN_A_DAY;
+  LPiecesADay := PiecesDay(LPiecesMadeInAnHour);
 
   //trovare i giorni che servono per produrre x pezzi:
   //x pezzi da produrre / pezzi prodotti in un giorno := giorni per produrre x pezzi
@@ -88,20 +93,19 @@ begin
   Result := DATE_INT + LDaysToMakeXPieces;
 
   //bisogna tenere in considerazione i giorni non lavorativi
+  //(forse prendendo in considerazione le settimane piuttosto che i giorni)
+
 
 end;
 
-function TPredictiveAlgorithm.GetTotalPiecesMade(
-  APartials: TList<TPartialModel>): Extended;
-var
-  I: integer;
-  LTotalPiecesMade: Extended;
+function TPredictiveAlgorithm.PiecesDay(Apieces: Extended): Extended;
 begin
-    for I := 0 to APartials.Count - 1 do
-  begin
-    LTotalPiecesMade := LTotalPiecesMade + APartials.Items[I].Quantity;
-  end;
-  Result := LTotalPiecesMade;
+  Result := Apieces * WORK_HOURS_IN_A_DAY;
+end;
+
+function TPredictiveAlgorithm.WorkTimeToDays(AHours: Extended): Extended;
+begin
+  Result := AHours / WORK_HOURS_IN_A_DAY;
 end;
 
 end.

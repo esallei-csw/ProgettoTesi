@@ -3,66 +3,63 @@ unit PredictiveMaintenanceRT.QueryExecutor;
 interface
 
 uses
-  System.SysUtils, FireDAC.Comp.Client, FireDAC.Stan.Def, FireDAC.Stan.Pool
-  , FireDAC.Stan.Async, FireDAC.Phys.Intf, FireDAC.Phys, FireDAC.Phys.ODBCBase
-  , FireDAC.Phys.MSSQL, FireDAC.VCLUI.Wait, FireDAC.DApt, FireDAC.Stan.Param
-  , FireDAC.DatS, FireDAC.DApt.Intf, FireDAC.Stan.Option, Data.DB;
+  System.SysUtils, Data.Win.ADODB, Data.DB;
+
 type
   TQueryExecutor = class
   private
-    FConnection: TFDConnection;
-    procedure SetupConnection(ADataBaseName, AServerName, AUserName, APassword: string);
+    FConnection: TADOConnection;
+    procedure SetupConnection(AUserName, APassword, ADBName, AServerName: string);
   public
-    constructor Create(ADataBaseName, AServerName, AUserName, APassword: string);
+    constructor Create(AUserName, APassword, ADBName, AServerName: string);
     destructor Destroy; override;
-    function ExecuteQuery(AQuery: string): TDataSet;
+    function ExecuteQuery(SQL: string): TADOQuery;
   end;
+
 implementation
 
-uses
-  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
-
 { TQueryExecutor }
-constructor TQueryExecutor.Create(ADataBaseName, AServerName, AUserName, APassword: string);
+
+uses
+  PredictiveMaintenanceRT.Constants;
+
+constructor TQueryExecutor.Create(AUserName, APassword, ADBName, AServerName: string);
 begin
   inherited Create;
-  FConnection := TFDConnection.Create(nil);
-  SetupConnection(ADataBaseName, AServerName, AUserName, APassword);
+  FConnection := TADOConnection.Create(nil);
+  SetupConnection(AUserName, APassword, ADBName, AServerName);
 end;
+
 destructor TQueryExecutor.Destroy;
 begin
   FConnection.Free;
   inherited Destroy;
 end;
-procedure TQueryExecutor.SetupConnection(ADataBaseName, AServerName, AUserName, APassword: string);
-begin
-  // Configurazione della connessione al database
-  FConnection.DriverName := DRIVER_NAME;
-  FConnection.Params.Database := ADataBaseName;
-  FConnection.Params.UserName := AUserName;
-  FConnection.Params.Password := APassword;
-  FConnection.Params.Add(SERVER + AServerName);
 
-  FConnection.LoginPrompt := False;
-  try
-    FConnection.Connected := True;
-  except
-    on E: Exception do
-      raise Exception.Create(DATABASE_CONNECTION_ERROR + E.Message);
-  end;
-end;
-function TQueryExecutor.ExecuteQuery(AQuery: string): TDataSet;
-var
-  Query: TFDQuery;
+procedure TQueryExecutor.SetupConnection(AUserName, APassword, ADBName, AServerName: string);
 begin
-  Query := TFDQuery.Create(nil);
+  FConnection.ConnectionString := Format(CONNECTION_STRING ,[AUserName, APassword, ADBName, AServerName]);
+  FConnection.LoginPrompt := False;
+  FConnection.Connected := True;
+end;
+
+function TQueryExecutor.ExecuteQuery(SQL: string): TADOQuery;
+var
+  Query: TADOQuery;
+begin
+  Query := TADOQuery.Create(nil);
   try
     Query.Connection := FConnection;
-    Query.SQL.Text := AQuery;
-    Query.Open;
+    Query.SQL.Text := SQL;
+    Query.Open; // Apri il dataset
     Result := Query;
-  finally
-    Query.Free;
+  except
+    on E: Exception do
+    begin
+      Query.Free;
+      raise;
+    end;
   end;
 end;
+
 end.

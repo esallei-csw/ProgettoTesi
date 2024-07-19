@@ -15,13 +15,6 @@ const
   DEFAULT_PASSWORD = '1Password1';
   DEFAULT_CELLID = 13;
 
-  PARTIAL_ID = 'ID';
-  PARTIAL_CELLID = 'IDCelPro';
-  PARTIAL_START = 'Inizio';
-  PARTIAL_WORKHOURS = 'TempoLavoroInOre';
-  PARTIAL_END = 'Fine';
-  PARTIAL_QUANTITY = 'QtOut';
-
   QUERY_PARTIALS = 'select ID, IDCelPro, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut from OPSdlPar where (IDCelPro = %s) AND (Inizio > 45383) order by ID desc';
 
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +

@@ -15,7 +15,6 @@ type
     edtMaintenanceDate: TEdit;
     lblMaintenanceDate: TLabel;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
   private
     { Private declarations }
     FPredictiveMaintenance: IPredictiveMaintenance;
@@ -33,20 +32,9 @@ implementation
 
 {$R *.dfm}
 
-uses
-  PredictiveMaintenanceRT.Constants;
-
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
-var
-  LDate: TDateTime;
 begin
-  LDate := FloatToDateTime(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
-  edtMaintenanceDate.Text := DateTimeToStr(LDate);
-end;
-
-procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);
-begin
-  edtCellId.Text := inttostr(DEFAULT_CELLID);
+  edtMaintenanceDate.Text := floattostr(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
 end;
 
 function TfrmPredictiveMaintenance.GetPredictiveMaintenance: IPredictiveMaintenance;
