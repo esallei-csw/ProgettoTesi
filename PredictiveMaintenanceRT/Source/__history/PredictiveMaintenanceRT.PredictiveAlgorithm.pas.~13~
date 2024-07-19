@@ -12,7 +12,6 @@ type
     {Private declarations}
 
     function GetTotalPiecesMade(APartials: TList<TPartialModel>): Extended;
-    function GetPiecesAnHour(APartials: TList<TPartialModel>): Extended;
   public
     {Public declarations}
 
@@ -22,7 +21,7 @@ type
 implementation
 
 uses
-  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
+  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.PartialModel;
 
 { TPredictiveAlgorithm }
 
@@ -69,7 +68,7 @@ begin
   //pezzi all ora := pezzi prodotti / ore impiegate (dati che vengono presi da un parziale)
   //in questo caso vengono presi dal primo parziale per comodità
   //sarebbe meglio prenderli dall ultimo che dovrebbe essere quello più corretto ed aggiornato
-  LPiecesAnHour := GetPiecesAnHour(ACell.Partials);
+  LPiecesAnHour := ACell.Partials[1].Quantity / ACell.Partials[1].WorkHours;
 
   //ore di lavoro per produrre x pezzi := xpezzi / pezzi all ora
   LHoursToMakeXPieces := LPiecesToNextMaintenance / LPiecesAnHour;
@@ -92,28 +91,13 @@ begin
 
 end;
 
-function TPredictiveAlgorithm.GetPiecesAnHour(
-  APartials: TList<TPartialModel>): Extended;
-var
-  I: integer;
-  LMedian: Extended;
-begin
-  LMedian := 0;
-  for I := 0 to APartials.Count - 1 do
-  begin
-    LMedian := LMedian + (APartials[I].Quantity / APartials[I].WorkHours);
-  end;
-  Result := LMedian / APartials.Count;
-end;
-
 function TPredictiveAlgorithm.GetTotalPiecesMade(
   APartials: TList<TPartialModel>): Extended;
 var
   I: integer;
   LTotalPiecesMade: Extended;
 begin
-  LTotalPiecesMade := 0;
-  for I := 0 to APartials.Count - 1 do
+    for I := 0 to APartials.Count - 1 do
   begin
     LTotalPiecesMade := LTotalPiecesMade + APartials.Items[I].Quantity;
   end;
