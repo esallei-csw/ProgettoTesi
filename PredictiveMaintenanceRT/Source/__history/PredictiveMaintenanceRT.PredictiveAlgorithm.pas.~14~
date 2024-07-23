@@ -9,19 +9,20 @@ type
   TPredictiveAlgorithm = class
 
   private
-  {Private declarations}
+    {Private declarations}
 
     function GetTotalPiecesMade(APartials: TList<TPartialModel>): Extended;
     function GetPiecesAnHour(APartials: TList<TPartialModel>): Extended;
   public
-  {Public declarations}
+    {Public declarations}
+
     function CalculateMaintenanceDate(ACell: TCellDataModel): Extended;
   end;
 
 implementation
 
 uses
-  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
+  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
 
 { TPredictiveAlgorithm }
 
@@ -36,7 +37,15 @@ var
   LTotalPiecesMade: Extended;
   I: integer;
 begin
-  LTotalPiecesMade := varEmpty;
+  LTotalPiecesMade := 0;
+  //convertire FWorkTimeToNextMaintenance in giorni di lavoro calcolando che la macchina lavorerà teoricamente
+  //8 ore al giorno e solo 5 giorni alla settimana quindi fare un calcolo che ritorna una data nel futuro
+
+
+  //prendere in considerazione solo i tempi di lavoro per calcolare la data in base alla soglia tramite tempo di lavoro+
+
+  //prendere in considerazione solo i pezzi prodotti per calcolare la data in base alla soglia tramite i pezzi prodotti
+
 
   //se so che la soglia è di 100 pezzi e ne ho già prodotti 30 fino ad adesso la data sarà:
   //data di oggi + giorni che servono per produrre altri 70 pezzi
@@ -55,7 +64,7 @@ begin
 
   LTotalPiecesMade := GetTotalPiecesMade(ACell.Partials);
 
-  LPiecesToNextMaintenance := ACell.MaintenanceData.ThresholdPieces - LTotalPiecesMade;
+  LPiecesToNextMaintenance := ACell.ThresholdPieces - LTotalPiecesMade;
 
   //pezzi all ora := pezzi prodotti / ore impiegate (dati che vengono presi da un parziale)
   //in questo caso vengono presi dal primo parziale per comodità
@@ -77,20 +86,9 @@ begin
   //x pezzi da produrre / pezzi prodotti in un giorno := giorni per produrre x pezzi
   LDaysToMakeXPieces := LPiecesToNextMaintenance / LPiecesADay;
 
-  Result := now + LDaysToMakeXPieces;
+  Result := DATE_INT + LDaysToMakeXPieces;
 
   //bisogna tenere in considerazione i giorni non lavorativi
-
-  //trovare quanti pezzi posso fare prima della manutenzione := LPiecesToNextMaintenance
-  //confrontarli con i pezzi che dovranno essere fatti nel futuro in base agli ordini di produzione
-  //salvo all interno della cella una lista degli ordini di produzione,
-  //dopodichè li sommo uno a uno e quando arrivo all ordine che supera i pezzi,
-  //segno la data di fine dell ordine di produzione precedente
-  //cosi da inserire la manutenzione tra 2 ordini di produzione
-
-  //nel caso non sia necessario inserire la manutenzione tra 2 ordini di produzione
-  //mi basterà prendere
-
 
 end;
 
@@ -103,8 +101,7 @@ begin
   LMedian := 0;
   for I := 0 to APartials.Count - 1 do
   begin
-    if APartials[I].WorkHours <> 0 then
-      LMedian := LMedian + (APartials[I].Quantity / APartials[I].WorkHours);
+    LMedian := LMedian + (APartials[I].Quantity / APartials[I].WorkHours);
   end;
   Result := LMedian / APartials.Count;
 end;

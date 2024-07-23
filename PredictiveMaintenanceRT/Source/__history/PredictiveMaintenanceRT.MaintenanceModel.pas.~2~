@@ -1,0 +1,44 @@
+unit PredictiveMaintenanceRT.MaintenanceModel;
+
+interface
+
+type
+  TMaintenanceModel = class
+
+  private
+  {Private declarations}
+    FCellId: Integer;
+    FThresholdPieces: integer;
+    FThresholdHoursWorked: Extended;
+    FThresholdDays: Integer;
+    FThresholdMonths: Integer;
+    FLastMaintenance: Extended;
+
+  public
+  {Public declarations}
+    constructor Create;
+    property CellId: integer read FCellId write FCellId;
+    property ThresholdPieces: integer read FThresholdPieces write FThresholdPieces;
+    property ThresholdHoursWorked: Extended read FThresholdHoursWorked write FThresholdHoursWorked;
+    property ThresholdDays: Integer read FThresholdDays write FThresholdDays;
+    property ThresholdMonths: Integer read FThresholdMonths write FThresholdMonths;
+    property LastMaintenance: Extended read FLastMaintenance write FLastMaintenance;
+
+
+  end;
+
+implementation
+
+{ TMaintenanceModel }
+
+constructor TMaintenanceModel.Create;
+begin
+  FCellId := varEmpty;
+  FThresholdPieces := varEmpty;
+  FThresholdHoursWorked := varEmpty;
+  FThresholdDays := varEmpty;
+  FThresholdMonths := varEmpty;
+  FLastMaintenance := varEmpty;
+end;
+
+end.

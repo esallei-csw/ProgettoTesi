@@ -2,35 +2,37 @@
 <BorlandProject>
 	<Transactions>
     <Transaction>2024/07/16 09:56:44.000.341,=rtl.dcp</Transaction>
-    <Transaction>2024/07/16 09:57:36.000.798,C:\Users\esallei\OneDrive - centrosoftware.com\Documenti\Embarcadero\Studio\Projects\Package1.dproj=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj</Transaction>
+    <Transaction>2024/07/16 09:57:36.000.798,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\PredictiveMaintenanceRT.dproj=C:\Users\esallei\OneDrive - centrosoftware.com\Documenti\Embarcadero\Studio\Projects\Package1.dproj</Transaction>
     <Transaction>2024/07/16 09:57:47.000.465,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/16 09:58:23.000.619,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.BusinessLogic.pas</Transaction>
+    <Transaction>2024/07/16 09:58:23.000.619,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.BusinessLogic.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/16 10:00:42.000.188,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/16 10:01:07.000.850,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.BusinessLogicInterface.pas</Transaction>
+    <Transaction>2024/07/16 10:01:07.000.850,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.BusinessLogicInterface.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/16 15:01:44.000.935,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/16 15:02:12.000.736,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.QueryExecutor.pas</Transaction>
+    <Transaction>2024/07/16 15:02:12.000.736,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.QueryExecutor.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/16 15:09:39.000.402,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/16 15:10:09.000.799,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.PredictiveAlgorithm.pas</Transaction>
+    <Transaction>2024/07/16 15:10:09.000.799,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.PredictiveAlgorithm.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/17 10:14:12.000.851,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/17 10:15:33.000.505,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Constants.pas</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.296,=vclFireDAC.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.355,=FireDACCommon.dcp</Transaction>
+    <Transaction>2024/07/17 10:15:33.000.505,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Constants.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/17 10:17:51.000.336,=FireDACCommonDriver.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.261,=vcl.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.397,=FireDACMSSQLDriver.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.319,=FireDAC.dcp</Transaction>
     <Transaction>2024/07/17 10:17:51.000.279,=dbrtl.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.355,=FireDACCommon.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.397,=FireDACMSSQLDriver.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.296,=vclFireDAC.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.319,=FireDAC.dcp</Transaction>
     <Transaction>2024/07/17 10:17:51.000.381,=FireDACCommonODBC.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.261,=vcl.dcp</Transaction>
     <Transaction>2024/07/17 10:19:58.000.809,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/17 10:20:32.000.085,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Messages.pas</Transaction>
+    <Transaction>2024/07/17 10:20:32.000.085,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Messages.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/17 11:02:34.000.340,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/17 11:05:32.000.777,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.DataModel.pas</Transaction>
-    <Transaction>2024/07/17 11:11:17.000.058,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.DataModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.CellDataModel.pas</Transaction>
+    <Transaction>2024/07/17 11:05:32.000.777,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.DataModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/07/17 11:11:17.000.058,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.CellDataModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.DataModel.pas</Transaction>
     <Transaction>2024/07/17 16:19:12.000.360,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/17 16:19:33.000.571,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Partial.pas</Transaction>
-    <Transaction>2024/07/17 16:43:59.000.408,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Partial.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.PartialModel.pas</Transaction>
-    <Transaction>2024/07/19 15:42:35.261,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
-    <Transaction>2024/07/19 15:43:37.542,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.QueryHandler.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/07/17 16:19:33.000.571,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Partial.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/07/17 16:43:59.000.408,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.PartialModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Partial.pas</Transaction>
+    <Transaction>2024/07/19 15:42:35.000.261,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/07/19 15:43:37.000.542,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.QueryHandler.pas</Transaction>
+    <Transaction>2024/07/22 11:59:23.000.492,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/07/22 12:00:13.000.168,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.MaintenanceModel.pas</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="Source"/>
@@ -43,6 +45,7 @@
     <File Path="Source\PredictiveMaintenanceRT.PredictiveAlgorithm.pas"/>
     <File Path="Source\PredictiveMaintenanceRT.QueryExecutor.pas"/>
     <File Path="Source\PredictiveMaintenanceRT.QueryHandler.pas"/>
+    <File Path="Source\PredictiveMaintenanceRT.MaintenanceModel.pas"/>
     <File Path="dbrtl.dcp"/>
     <File Path="FireDAC.dcp"/>
     <File Path="FireDACCommon.dcp"/>

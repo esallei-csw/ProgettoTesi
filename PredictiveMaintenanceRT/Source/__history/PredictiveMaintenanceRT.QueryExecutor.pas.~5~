@@ -4,6 +4,7 @@ interface
 
 uses
   System.SysUtils, Data.Win.ADODB, Data.DB;
+
 type
   TQueryExecutor = class
   private
@@ -14,8 +15,11 @@ type
     destructor Destroy; override;
     function ExecuteQuery(SQL: string): TADOQuery;
   end;
+
 implementation
+
 { TQueryExecutor }
+
 uses
   PredictiveMaintenanceRT.Constants;
 
@@ -40,21 +44,22 @@ begin
 end;
 
 function TQueryExecutor.ExecuteQuery(SQL: string): TADOQuery;
-//var
-//  LQuery: TADOQuery;
+var
+  Query: TADOQuery;
 begin
-  Result := TADOQuery.Create(nil);
+  Query := TADOQuery.Create(nil);
   try
-    Result.Connection := FConnection;
-    Result.SQL.Text := SQL;
-    Result.Open;
-//    Result := LQuery;
+    Query.Connection := FConnection;
+    Query.SQL.Text := SQL;
+    Query.Open; // Apri il dataset
+    Result := Query;
   except
     on E: Exception do
     begin
-//      LQuery.Free;
+      Query.Free;
       raise;
     end;
   end;
 end;
+
 end.

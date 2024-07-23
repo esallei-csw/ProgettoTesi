@@ -44,7 +44,7 @@ begin
   Result := TCellDataModel.Create;
   Result.CellId := ACellId;
 
-  Result.MaintenanceData := PopulateMaintenanceData(ACellId).Clone;
+  Result.MaintenanceData := PopulateMaintenanceData(ACellId);
 
   Result.Partials := PopulatePartials(ACellId, Result.MaintenanceData.LastMaintenance);
 

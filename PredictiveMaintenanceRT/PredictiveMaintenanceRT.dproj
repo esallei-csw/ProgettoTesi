@@ -96,6 +96,7 @@
         <DCCReference Include="Source\PredictiveMaintenanceRT.CellDataModel.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.PartialModel.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.QueryHandler.pas"/>
+        <DCCReference Include="Source\PredictiveMaintenanceRT.MaintenanceModel.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

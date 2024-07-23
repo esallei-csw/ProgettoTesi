@@ -71,8 +71,10 @@ function TPredictiveMaintenance.GetCellModel(
 var
   LCellModel: TCellDataModel;
 begin
+  LCellModel := TCellDataModel.Create;
+  LCellModel.CellId := ACellId;
   //funzione che popola i dati del modello tramite querySQL
-  LCellModel := QueryHandler.PopulateCellModel(ACellId);
+  LCellModel := QueryHandler.PopulateCellModel(LCellModel);
   Result := LCellModel;
 end;
 

@@ -9,7 +9,6 @@ resourcestring
 
   SQL_DATA_NOTFOUND = 'SQL Data Not Found';
   DATASET_CLOSED = 'Dataset is not open.';
-  SQL_ERROR = 'SQL Error';
 
 implementation
 

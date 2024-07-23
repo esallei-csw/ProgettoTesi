@@ -17,11 +17,8 @@ type
     public
     {Public declarations}
     constructor Create;
-    destructor Destroy; override;
     property CellId: integer read FCellId write FCellId;
-
     property MaintenanceData: TMaintenanceModel read FMaintenanceData write FMaintenanceData;
-
     property Partials: TList<TPartialModel> read FPartials write FPartials;
 
 
@@ -34,15 +31,8 @@ implementation
 constructor TCellDataModel.Create;
 begin
   FCellId := varEmpty;
-  FMaintenanceData := TMaintenanceModel.Create;
-  FPartials := TList<TPartialModel>.Create;
-end;
-
-destructor TCellDataModel.Destroy;
-begin
-  FMaintenanceData.Free;
-  FPartials.Free;
-  inherited;
+  FMaintenanceData := nil;
+  FPartials := nil;
 end;
 
 end.

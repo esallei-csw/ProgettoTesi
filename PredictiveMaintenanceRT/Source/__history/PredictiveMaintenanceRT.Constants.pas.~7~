@@ -3,6 +3,11 @@ unit PredictiveMaintenanceRT.Constants;
 interface
 
 const
+  DRIVER_NAME = 'MSSQL';
+  SERVER = 'Server=';
+
+  WORK_HOURS_IN_A_DAY = 8;
+  DATE_INT = 45491;
 
   DB_NAME = 'SAMTESI';
   SERVER_NAME = 'CSW325';
@@ -10,10 +15,8 @@ const
   DEFAULT_PASSWORD = '1Password1';
   DEFAULT_CELLID = 13;
 
-
-  WORK_HOURS_IN_A_DAY = 8;
-
   PARTIAL_ID = 'ID';
+  PARTIAL_CELLID = 'IDCelPro';
   PARTIAL_START = 'Inizio';
   PARTIAL_WORKHOURS = 'TempoLavoroInOre';
   PARTIAL_END = 'Fine';
@@ -25,7 +28,7 @@ const
   MAINTENANCE_QTA = 'QTA';
   MAINTENANCE_HOURS = 'TempoInOre';
 
-  QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
+  QUERY_PARTIALS = 'select ID, IDCelPro, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
   QUERY_MAINTENANCE = 'select IDCELPRO, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI where IDCELPRO = %s';
 
 
