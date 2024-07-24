@@ -62,14 +62,10 @@ begin
   LPiecesAnHour := GetPiecesAnHour(ACell.Partials);
 
   //ore di lavoro per produrre x pezzi := xpezzi / pezzi all ora
-  if LPiecesAnHour = 0 then
-    raise Exception.Create(VALUE_ZERO);
   LHoursToMakeXPieces := LPiecesToNextMaintenance / LPiecesAnHour;
   //calcolare quanti pezzi produco all ora in media:
   //pezzi prodotti / ore di lavoro per produrre x pezzi := pezzi prodotti in un ora
   //questi dati vengono presi dall ultimo parziale, si potrebbe prendere facendo una media degli ultimi x parziali(in un secondo momento)
-  if LHoursToMakeXPieces = 0 then
-    raise Exception.Create(VALUE_ZERO);
   LPiecesMadeInAnHour := LPiecesToNextMaintenance / LHoursToMakeXPieces;
 
   //trovare a questo punto i pezzi prodotti in una giornata di lavoro:
@@ -78,8 +74,6 @@ begin
 
   //trovare i giorni che servono per produrre x pezzi:
   //x pezzi da produrre / pezzi prodotti in un giorno := giorni per produrre x pezzi
-  if LPiecesADay = 0 then
-    raise Exception.Create(VALUE_ZERO);
   LDaysToMakeXPieces := LPiecesToNextMaintenance / LPiecesADay;
 
   Result := now + LDaysToMakeXPieces;
@@ -102,33 +96,26 @@ begin
   LTimeFromLastMaintenance := now - ACell.MaintenanceData.LastMaintenance;
 
   //convertire i mesi e giorni in giorni
-  LThresholdDays := ACell.MaintenanceData.ThresholdDays + (ACell.MaintenanceData.ThresholdMonths * DAYS_IN_A_MONTH);
+  LThresholdDays := ACell.MaintenanceData.ThresholdDays + (ACell.MaintenanceData.ThresholdMonths * 30);
 
   //sottrarre dal tempo soglia il tempo dall ultima manutenzione
   LTimeToNextMaintenance := LThresholdDays - LTimeFromLastMaintenance;
 
   //il tempo rimasto andrà poi sommato alla data di oggi per avere la data di manutenzione
-  Result := now + LTimeToNextMaintenance;
+  Result := now - LTimeToNextMaintenance;
 end;
 
 function TPredictiveAlgorithm.CalcPrevision(ACell: TCellDataModel): Extended;
 begin
-
+  Result := 100000;
 end;
 
 function TPredictiveAlgorithm.CalculateMaintenanceDate(ACell: TCellDataModel): Extended;
-var
-  LConsuntiveDatePieces: Extended;
-  LConsuntiveDateTime: Extended;
 begin
-  LConsuntiveDatePieces := CalcConsuntivePieces(ACell);
-  LConsuntiveDateTime := CalcConsuntiveTime(ACell);
+
   //il risultato sarà la data piu vicina tra il calcolo in base alla soglia pezzi
   //e il calcolo in base alla soglia tempo
-  Result := Min(LConsuntiveDatePieces, LConsuntiveDateTime);
-
-  if Result <= now then
-    raise Exception.Create(MAINTENANCE_MESSAGE);
+  Result := Min(CalcConsuntivePieces(ACell), CalcConsuntiveTime(ACell));
 
 
   //trovare quanti pezzi posso fare prima della manutenzione := LPiecesToNextMaintenance

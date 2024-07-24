@@ -12,7 +12,6 @@ const
 
 
   WORK_HOURS_IN_A_DAY = 8;
-  DAYS_IN_A_MONTH = 30;
 
   PARTIAL_ID = 'ID';
   PARTIAL_START = 'Inizio';
