@@ -8,19 +8,19 @@ type
   private
   {Private declarations}
     FThresholdPieces: integer;
-    FThresholdHoursWorked: Double;
+    FThresholdHoursWorked: Extended;
     FThresholdDays: Integer;
     FThresholdMonths: Integer;
-    FLastMaintenance: Double;
+    FLastMaintenance: Extended;
 
   public
   {Public declarations}
     constructor Create;
     property ThresholdPieces: integer read FThresholdPieces write FThresholdPieces;
-    property ThresholdHoursWorked: Double read FThresholdHoursWorked write FThresholdHoursWorked;
+    property ThresholdHoursWorked: Extended read FThresholdHoursWorked write FThresholdHoursWorked;
     property ThresholdDays: Integer read FThresholdDays write FThresholdDays;
     property ThresholdMonths: Integer read FThresholdMonths write FThresholdMonths;
-    property LastMaintenance: Double read FLastMaintenance write FLastMaintenance;
+    property LastMaintenance: Extended read FLastMaintenance write FLastMaintenance;
 
     function Clone: TMaintenanceModel;
 

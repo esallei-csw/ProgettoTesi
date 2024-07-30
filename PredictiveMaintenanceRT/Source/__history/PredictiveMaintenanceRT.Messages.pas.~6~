@@ -14,8 +14,6 @@ resourcestring
   MAINTENANCE_BEFORE_NOW = 'Attenzione, la manutenzione dovrebbe già essere stata fattam procedere alla manutenzione il prima possibile o aggiornare la data di ultima manutenzione';
   VALUE_ZERO = 'Errore nel calcolo: valore = 0';
 
-  FINISHED_PO = 'Finiti gli ordini di produzione';
-
 implementation
 
 end.

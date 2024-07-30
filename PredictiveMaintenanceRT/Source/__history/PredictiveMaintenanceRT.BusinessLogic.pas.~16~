@@ -6,7 +6,7 @@ uses
   PredictiveMaintenanceRT.BusinessLogicInterface, PredictiveMaintenanceRT.PredictiveAlgorithm, 
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.QueryExecutor,
   PredictiveMaintenanceRT.PartialModel, Data.DB, System.Generics.Collections,
-  FireDAC.Comp.Client;
+  FireDAC.Comp.Client, Data.Win.ADODB, PredictiveMaintenanceRT.QueryHandler;
 
 type
   TPredictiveMaintenance = class(TInterfacedObject, IPredictiveMaintenance)
@@ -14,18 +14,20 @@ type
   private
     {Private declarations}
     FPredictiveAlgorithm: TPredictiveAlgorithm;
+    FQueryHandler: TQueryHandler;
     FQueryExecutor: TQueryExecutor;
 
     function GetPredictiveAlgorithm: TPredictiveAlgorithm;
     property PredictiveAlgorithm: TPredictiveAlgorithm read GetPredictiveAlgorithm write FPredictiveAlgorithm;
-    
+
+    function GetQueryHandler: TQueryHandler;
+    property QueryHandler: TQueryHandler read getQueryHandler write FQueryHandler;
+
     function GetQueryExecutor: TQueryExecutor;
     property QueryExecutor: TQueryExecutor read GetQueryExecutor write FQueryExecutor;
 
-    
+
     function GetCellModel(ACellId: integer): TCellDataModel;
-    function PopulateCellModel(ACell: TCellDataModel): TCellDataModel;
-    function DataSetToList(ADataSet: TFDQuery): TList<TPartialModel>;
   public
     {Public declarations}
     function GetMaintenanceDate(ACellId: integer): Extended;
@@ -36,7 +38,7 @@ implementation
 
 { TPredictiveMaintenance }
 uses
-  PredictiveMaintenanceRT.Constants, System.SysUtils;
+  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
 function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): Extended;
 begin
@@ -53,54 +55,15 @@ end;
  function TPredictiveMaintenance.GetQueryExecutor: TQueryExecutor;
 begin
   if not Assigned(FQueryExecutor) then
-    FQueryExecutor := TQueryExecutor.Create(DB_NAME, SERVER_NAME, DEFAULT_USERNAME, DEFAULT_PASSWORD);
+    FQueryExecutor := TQueryExecutor.Create(DEFAULT_USERNAME, DEFAULT_PASSWORD, DB_NAME, SERVER_NAME);
   Result := FQueryExecutor;
 end;
 
-function TPredictiveMaintenance.PopulateCellModel(ACell: TCellDataModel): TCellDataModel;
-var
-  LData: TFDQuery;
+function TPredictiveMaintenance.GetQueryHandler: TQueryHandler;
 begin
-  try
-    LData := QueryExecutor.ExecuteQuery(Format(QUERY_PARTIALS, [intToStr(ACell.CellId)]));
-    if LData <> nil then
-      ACell.Partials := DataSetToList(LData)
-    else
-      raise Exception.Create('SQL Data Not Found');
-    Result := ACell;
-  finally
-    LData.Free;
-  end;
-
-end;
-
-function TPredictiveMaintenance.DataSetToList(
-  ADataSet: TFDQuery): TList<TPartialModel>;
-var
-  LPartials: TList<TPartialModel>;
-  LPartial: TPartialModel;
-begin
-  LPartials := TList<TPartialModel>.Create;
-  try
-    ADataSet.Open;
-    if not ADataSet.Active then
-      raise Exception.Create('Dataset is not open.');
-    ADataSet.First;
-    while not ADataSet.Eof do
-    begin
-      LPartial.PartialId := ADataSet.FieldByName('ID').AsInteger;
-      LPartial.CellId := ADataSet.FieldByName('IDCelPro').AsInteger;
-      LPartial.StartTime := ADataSet.FieldByName('Inizio').AsFloat;
-      LPartial.WorkHours := ADataSet.FieldByName('TempoLavoroInOre').AsFloat;
-      LPartial.EndTime := ADataSet.FieldByName('Fine').AsFloat;
-      LPartial.Quantity := ADataSet.FieldByName('QtOut').AsFloat;
-      LPartials.Add(LPartial);
-      ADataSet.Next;
-    end;
-    Result := LPartials;
-  finally
-    LPartials.Free;
-  end;
+  if not Assigned(FQueryHandler) then
+    FQueryHandler := TQueryHandler.Create;
+  Result:= FQueryHandler;
 end;
 
 function TPredictiveMaintenance.GetCellModel(
@@ -108,11 +71,8 @@ function TPredictiveMaintenance.GetCellModel(
 var
   LCellModel: TCellDataModel;
 begin
-  LCellModel := TCellDataModel.Create;
-  LCellModel.CellId := ACellId;
-  LCellModel.ThresholdPieces := 5000;
   //funzione che popola i dati del modello tramite querySQL
-  LCellModel := PopulateCellModel(LCellModel);
+  LCellModel := QueryHandler.PopulateCellModel(ACellId);
   Result := LCellModel;
 end;
 

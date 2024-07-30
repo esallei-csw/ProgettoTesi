@@ -3,16 +3,15 @@ unit PredictiveMaintenanceRT.CellDataModel;
 interface
 
 uses
-  PredictiveMaintenanceRT.PartialModel, System.Generics.Collections, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel;
+  PredictiveMaintenanceRT.PartialModel, System.Generics.Collections, PredictiveMaintenanceRT.MaintenanceModel;
 
 type
   TCellDataModel = class
     private
     {Private declarations}
     FCellId: integer;
-    FMaintenanceData: TList<TMaintenanceModel>;
+    FMaintenanceData: TMaintenanceModel;
     FPartials: TList<TPartialModel>;
-    FProductionOrders: TList<TProductionOrderModel>;
 
 
     public
@@ -21,11 +20,9 @@ type
     destructor Destroy; override;
     property CellId: integer read FCellId write FCellId;
 
-    property MaintenanceData: TList<TMaintenanceModel> read FMaintenanceData write FMaintenanceData;
+    property MaintenanceData: TMaintenanceModel read FMaintenanceData write FMaintenanceData;
 
     property Partials: TList<TPartialModel> read FPartials write FPartials;
-
-    property ProductionOrders: TList<TProductionOrderModel> read FProductionOrders write FProductionOrders;
 
 
   end;
@@ -37,16 +34,14 @@ implementation
 constructor TCellDataModel.Create;
 begin
   FCellId := varEmpty;
-  FMaintenanceData := TList<TMaintenanceModel>.Create;
+  FMaintenanceData := TMaintenanceModel.Create;
   FPartials := TList<TPartialModel>.Create;
-  FProductionOrders := TList<TProductionOrderModel>.Create;
 end;
 
 destructor TCellDataModel.Destroy;
 begin
   FMaintenanceData.Free;
   FPartials.Free;
-  FProductionOrders.Free;
   inherited;
 end;
 

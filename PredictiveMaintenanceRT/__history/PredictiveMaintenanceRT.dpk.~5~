@@ -48,9 +48,7 @@ contains
   PredictiveMaintenanceRT.CellDataModel in 'Source\PredictiveMaintenanceRT.CellDataModel.pas',
   PredictiveMaintenanceRT.PartialModel in 'Source\PredictiveMaintenanceRT.PartialModel.pas',
   PredictiveMaintenanceRT.QueryHandler in 'Source\PredictiveMaintenanceRT.QueryHandler.pas',
-  PredictiveMaintenanceRT.MaintenanceModel in 'Source\PredictiveMaintenanceRT.MaintenanceModel.pas',
-  PredictiveMaintenanceRT.WorkHoursCalculator in 'Source\PredictiveMaintenanceRT.WorkHoursCalculator.pas',
-  PredictiveMaintenanceRT.ProductionOrderModel in 'Source\PredictiveMaintenanceRT.ProductionOrderModel.pas';
+  PredictiveMaintenanceRT.MaintenanceModel in 'Source\PredictiveMaintenanceRT.MaintenanceModel.pas';
 
 end.
 

@@ -30,7 +30,7 @@ type
     function GetCellModel(ACellId: integer): TCellDataModel;
   public
     {Public declarations}
-    function GetMaintenanceDate(ACellId: integer): TList<Double>;
+    function GetMaintenanceDate(ACellId: integer): Extended;
 
   end;
 
@@ -40,7 +40,7 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
-function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<Double>;
+function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): Extended;
 begin
   Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
 end;

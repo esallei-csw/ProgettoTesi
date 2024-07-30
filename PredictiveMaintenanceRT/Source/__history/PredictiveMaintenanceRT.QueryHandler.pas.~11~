@@ -4,7 +4,7 @@ interface
 
 uses
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel, Data.Win.ADODB, System.Generics.Collections,
-  PredictiveMaintenanceRT.QueryExecutor, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel;
+  PredictiveMaintenanceRT.QueryExecutor, PredictiveMaintenanceRT.MaintenanceModel;
 
 type
   TQueryHandler = class
@@ -14,12 +14,9 @@ type
     FQueryExecutor: TQueryExecutor;
 
     function QueryToList(AQuery : TADOQuery): TList<TPartialModel>;
-    function QueryToMaintenanceData(AQuery: TADOQuery): TList<TMaintenanceModel>;
-    function QueryToListProductionOrder(AQuery: TADOQuery): TList<TProductionOrderModel>;
-
+    function QueryToMaintenanceData(AQuery: TADOQuery): TMaintenanceModel;
     function PopulatePartials(ACellId: integer; ALastMaintenance: Extended): TList<TPartialModel>;
-    function PopulateMaintenanceData(ACellId: integer): TList<TMaintenanceModel>;
-    function PopulateProductionOrders(ACellId: integer): TList<TProductionOrderModel>;
+    function PopulateMaintenanceData(ACellId: integer): TMaintenanceModel;
 
     function GetQueryExecutor: TQueryExecutor;
     property QueryExecutor: TQueryExecutor read GetQueryExecutor write FQueryExecutor;
@@ -45,24 +42,16 @@ end;
 function TQueryHandler.PopulateCellModel(ACellId: integer): TCellDataModel;
 begin
   Result := TCellDataModel.Create;
-  try
-    Result.CellId := ACellId;
+  Result.CellId := ACellId;
 
-    Result.MaintenanceData := PopulateMaintenanceData(ACellId);
+  Result.MaintenanceData := PopulateMaintenanceData(ACellId).Clone;
 
-    Result.Partials := PopulatePartials(ACellId, Result.MaintenanceData[0].LastMaintenance);
+  Result.Partials := PopulatePartials(ACellId, Result.MaintenanceData.LastMaintenance);
 
-    Result.ProductionOrders := PopulateProductionOrders(ACellId);
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
-  end;
 end;
 
 function TQueryHandler.PopulateMaintenanceData(
-  ACellId: integer): TList<TMaintenanceModel>;
+  ACellId: integer): TMaintenanceModel;
 var
   LQuery: TADOQuery;
 begin
@@ -75,11 +64,13 @@ begin
   finally
     LQuery.Free;
   end;
+
 end;
 
 function TQueryHandler.PopulatePartials(ACellId: integer; ALastMaintenance: Extended): TList<TPartialModel>;
 var
   LQuery: TADOQuery;
+//  LPartials: TList<TPartialModel>;
 begin
   try
     LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_PARTIALS, [intToStr(ACellId), FloatToStr(ALastMaintenance)]));
@@ -87,24 +78,9 @@ begin
       Result := QueryToList(LQuery)
     else
       raise Exception.Create(SQL_DATA_NOTFOUND);
+//    Result := LPartials;
   finally
-    LQuery.Free;
-  end;
-
-end;
-
-function TQueryHandler.PopulateProductionOrders(
-  ACellId: integer): TList<TProductionOrderModel>;
-var
-  LQuery: TADOQuery;
-begin
-  try
-    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_PRODUCTION_ORDERS, [intToStr(ACellId)]));
-    if LQuery <> nil then
-      Result := QueryToListProductionOrder(LQuery)
-    else
-      raise Exception.Create(SQL_DATA_NOTFOUND);
-  finally
+//    LPartials.Free;
     LQuery.Free;
   end;
 
@@ -112,9 +88,10 @@ end;
 
 function TQueryHandler.QueryToList(AQuery: TADOQuery): TList<TPartialModel>;
 var
+  LPartials: TList<TPartialModel>;
   LPartial: TPartialModel;
 begin
-  Result := TList<TPartialModel>.Create;
+  LPartials := TList<TPartialModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -127,75 +104,46 @@ begin
       LPartial.WorkHours := AQuery.FieldByName(PARTIAL_WORKHOURS).AsFloat;
       LPartial.EndTime := AQuery.FieldByName(PARTIAL_END).AsFloat;
       LPartial.Quantity := AQuery.FieldByName(PARTIAL_QUANTITY).AsFloat;
-      Result.Add(LPartial);
+      LPartials.Add(LPartial);
       AQuery.Next;
     end;
   except
+    on E: Exception do
     begin
-      Result.Free;
+      LPartials.Free;
       raise;
     end;
   end;
-end;
-
-function TQueryHandler.QueryToListProductionOrder(
-  AQuery: TADOQuery): TList<TProductionOrderModel>;
-var
-  LProductionOrder: TProductionOrderModel;
-begin
-  Result := TList<TProductionOrderModel>.Create;
-  try
-    if not AQuery.Active then
-      raise Exception.Create(DATASET_CLOSED);
-    AQuery.First;
-    while not AQuery.Eof do
-    begin
-      LProductionOrder := TProductionOrderModel.Create;
-      LProductionOrder.POID := AQuery.FieldByName(PO_ID).AsInteger;
-      LProductionOrder.Pieces := AQuery.FieldByName(PO_PIECES).AsFloat;
-      LProductionOrder.WorkHours := AQuery.FieldByName(PO_WORKHOURS).AsFloat;
-      Result.Add(LProductionOrder);
-      AQuery.Next;
-    end;
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
-  end;
+  Result := LPartials;
 end;
 
 function TQueryHandler.QueryToMaintenanceData(
-  AQuery: TADOQuery): TList<TMaintenanceModel>;
+  AQuery: TADOQuery): TMaintenanceModel;
 var
   LMaintenanceData: TMaintenanceModel;
 begin
-  Result := TList<TMaintenanceModel>.Create;
+  LMaintenanceData := TMaintenanceModel.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
     AQuery.First;
     while not AQuery.Eof do
     begin
-      LMaintenanceData := TMaintenanceModel.Create;
       LMaintenanceData.LastMaintenance := AQuery.FieldByName(ULTMAN).AsFloat;
-      LMaintenanceData.ThresholdPieces := AQuery.FieldByName(MAINTENANCE_QTA).AsInteger;
-      LMaintenanceData.ThresholdHoursWorked := AQuery.FieldByName(MAINTENANCE_HOURS).AsFloat;
-      LMaintenanceData.ThresholdDays := AQuery.FieldByName(GIORNI).AsInteger;
-      LMaintenanceData.ThresholdMonths := AQuery.FieldByName(MESI).AsInteger;
-      Result.Add(LMaintenanceData);
+      if AQuery.FieldByName(MAINTENANCE_QTA).AsInteger <> 0 then
+        LMaintenanceData.ThresholdPieces := AQuery.FieldByName(MAINTENANCE_QTA).AsInteger;
+      if AQuery.FieldByName(MAINTENANCE_HOURS).AsFloat <> 0 then
+        LMaintenanceData.ThresholdHoursWorked := AQuery.FieldByName(MAINTENANCE_HOURS).AsFloat;
+      if AQuery.FieldByName(GIORNI).AsInteger <> 0 then
+        LMaintenanceData.ThresholdDays := AQuery.FieldByName(GIORNI).AsInteger;
+      if AQuery.FieldByName(MESI).AsInteger <> 0 then
+        LMaintenanceData.ThresholdMonths := AQuery.FieldByName(MESI).AsInteger;
       AQuery.Next;
     end;
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
+    Result := LMaintenanceData;
+  finally
+    LMaintenanceData.Free;
   end;
 end;
 
 end.
-
-
-
-

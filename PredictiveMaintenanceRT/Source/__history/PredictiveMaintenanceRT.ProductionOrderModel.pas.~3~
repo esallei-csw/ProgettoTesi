@@ -1,0 +1,39 @@
+unit PredictiveMaintenanceRT.ProductionOrderModel;
+
+interface
+
+type
+  TProductionOrderModel = class
+    private
+    {Private declarations}
+    FPOID: integer;
+    FPieces: Double;
+    FHourlyProduction: Double;
+    FWorkHours: Double;
+    FTheoricEndDate: Double;
+
+    public
+    {Public declarations}
+    constructor Create;
+
+    property POID: integer read FPOID write FPOID;
+    property Pieces: Double read FPieces write FPieces;
+    property HourlyProduction: Double read FHourlyProduction write FHourlyProduction;
+    property WorkHours: Double read FWorkHours write FWorkHours;
+    property TheoricEndDate: Double read FTheoricEndDate write FTheoricEndDate;
+  end;
+
+implementation
+
+{ TProductionOrderModel }
+
+constructor TProductionOrderModel.Create;
+begin
+  FPOID := varEmpty;
+  FPieces := varEmpty;
+  FHourlyProduction := varEmpty;
+  FWorkHours := varEmpty;
+  FTheoricEndDate := varEmpty;
+end;
+
+end.

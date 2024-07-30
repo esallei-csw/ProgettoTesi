@@ -1,0 +1,210 @@
+unit PredictiveMaintenanceRT.PredictiveAlgorithm;
+
+interface
+
+uses
+  PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel, System.Generics.Collections;
+
+type
+  TPredictiveAlgorithm = class
+
+  private
+  {Private declarations}
+
+    function GetTotalPiecesMade(APartials: TList<TPartialModel>): Double;
+    function GetPiecesAnHour(APartials: TList<TPartialModel>): Double;
+
+    function CalcConsuntivePieces(ACell: TCellDataModel): Double;
+    function CalcConsuntiveTime(ACell: TCellDataModel): Double;
+
+    function CalcPrevision(ACell: TCellDataModel): Double;
+
+    function CalcNew(ACell: TCellDataModel): Double;
+  public
+  {Public declarations}
+    function CalculateMaintenanceDate(ACell: TCellDataModel): Double;
+  end;
+
+implementation
+
+uses
+  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils, System.Math;
+
+{ TPredictiveAlgorithm }
+
+function TPredictiveAlgorithm.CalcConsuntivePieces(ACell: TCellDataModel): Double;
+var
+  LPiecesAnHour: Double;
+  LPiecesToNextMaintenance: Double;
+  LHoursToMakeXPieces: Double;
+  LDaysToMakeXPieces: Double;
+  LPiecesMadeInAnHour: Double;
+  LPiecesADay: Double;
+  LTotalPiecesMade: Double;
+  I: integer;
+begin
+  LTotalPiecesMade := varEmpty;
+
+  //calcolo i pezzi totali fatti prendendoli dai parziali di una cella di lavoro
+
+  LTotalPiecesMade := GetTotalPiecesMade(ACell.Partials);
+
+
+  //calcolo i pezzi che mancano fino alla prossima manutenzione
+  LPiecesToNextMaintenance := ACell.MaintenanceData.ThresholdPieces - LTotalPiecesMade;
+
+  //pezzi all ora := pezzi prodotti / ore impiegate (dati che vengono presi da un parziale)
+  //in questo caso vengono presi dal primo parziale per comodità
+  //sarebbe meglio prenderli dall ultimo che dovrebbe essere quello più corretto ed aggiornato
+  LPiecesAnHour := GetPiecesAnHour(ACell.Partials);
+
+  //ore di lavoro per produrre x pezzi := xpezzi / pezzi all ora
+  if LPiecesAnHour = 0 then
+    raise Exception.Create(VALUE_ZERO);
+  LHoursToMakeXPieces := LPiecesToNextMaintenance / LPiecesAnHour;
+  //calcolare quanti pezzi produco all ora in media:
+  //pezzi prodotti / ore di lavoro per produrre x pezzi := pezzi prodotti in un ora
+  if LHoursToMakeXPieces = 0 then
+    raise Exception.Create(VALUE_ZERO);
+  LPiecesMadeInAnHour := LPiecesToNextMaintenance / LHoursToMakeXPieces;
+
+  //trovare a questo punto i pezzi prodotti in una giornata di lavoro:
+  //pezzi prodotti in un ora * 8 := pezzi prodotti in un giorno(8 ore)
+  LPiecesADay := LPiecesMadeInAnHour * WORK_HOURS_IN_A_DAY;
+
+  //trovare i giorni che servono per produrre x pezzi:
+  //x pezzi da produrre / pezzi prodotti in un giorno := giorni per produrre x pezzi
+  if LPiecesADay = 0 then
+    raise Exception.Create(VALUE_ZERO);
+  LDaysToMakeXPieces := LPiecesToNextMaintenance / LPiecesADay;
+
+  Result := now + LDaysToMakeXPieces;
+
+end;
+
+function TPredictiveAlgorithm.CalcConsuntiveTime(
+  ACell: TCellDataModel): Double;
+var
+  LTimeFromLastMaintenance: Double;
+  LThresholdDays: Integer;
+  LTimeToNextMaintenance: Double;
+begin
+  LTimeFromLastMaintenance := varEmpty;
+  LTimeToNextMaintenance := varEmpty;
+  LThresholdDays := varEmpty;
+  //queta funzione deve ritornare la data calcolandola in base alle soglie di tempo(Giorni e mesi)
+  //Calcolare prima di tutto il tempo passato dall ultima manutenzione
+  LTimeFromLastMaintenance := now - ACell.MaintenanceData.LastMaintenance;
+
+  //convertire i mesi e giorni in giorni
+  LThresholdDays := ACell.MaintenanceData.ThresholdDays + (ACell.MaintenanceData.ThresholdMonths * DAYS_IN_A_MONTH);
+
+  //sottrarre dal tempo soglia il tempo dall ultima manutenzione
+  LTimeToNextMaintenance := LThresholdDays - LTimeFromLastMaintenance;
+
+  //il tempo rimasto andrà poi sommato alla data di oggi per avere la data di manutenzione
+  Result := now + LTimeToNextMaintenance;
+end;
+
+function TPredictiveAlgorithm.CalcNew(ACell: TCellDataModel): Double;
+begin
+  //prima di tutto bisogna fare la divisione tra i diversi tipi di manutenzione
+
+  //ogni elemento della lista di maintenanceData contiene le soglie per un tipo diverso di manutenzione
+
+  //creare una funzione che ritorna la data in base a delle soglie(oggetto maintenanceData)
+
+  //la funzione deve prendere sia i valori passati che i valori futuri
+  //per quanto riguarda i valori passati possiamo utilizzarli per sapere quanti pezzi rimangono da produrre prima
+  //di una certa manutenzione/tempo che rimane prima della prossima manutenzione
+  //entrambi questi dati devono essere calcolati in base ai dati di partials e maintenance data
+  //questa funzione deve prendere in considerazione sia il tempo che i pezzi in modo tale che possa essere utilizzata
+  //per qualsiasi tipo di soglia(soglia tempo, soglia pezzi)
+  //ritornerà valori come PiecesToNextMaintenance o timeToNextMaintenance
+  //che sono gli unici valori interessanti che posso prendere solo dallo storico
+
+  //dopodichè ciclare sui giorni successivi a quello odierno
+  //controllare per ogni giorno: ore lavorative(0 se non lavorativo/feriale)
+  //pezzi che si stima vengano prodotti quel giorno
+
+  //in modo tale che in quel giorno li so che verranno prodotti x pezzi perchè me lo dice il previsionale
+  //e quindi posso sottrarre i pezzi prodotti quel giorno dai piecesToNextMaintenance
+
+  //per quanto riguarda il tempo posso dire che lavorerò x ore quel giorno su quella macchina
+  //e quindi sottrarrò x ore da TimeTONextMaintenance
+
+  //per entrambi fino ad arrivare al punto in cui la sottrazione porta a 0 o a un numero negativo
+
+
+
+  //dati iniziali: Piecestonextmaintenance, time to next maintenance
+end;
+
+function TPredictiveAlgorithm.CalcPrevision(ACell: TCellDataModel): Double;
+begin
+
+end;
+
+function TPredictiveAlgorithm.CalculateMaintenanceDate(ACell: TCellDataModel): Double;
+var
+  LConsuntiveDatePieces: Double;
+  LConsuntiveDateTime: Double;
+begin
+  //trovo le date in base a 2 tipi di soglie diversi
+  LConsuntiveDatePieces := CalcConsuntivePieces(ACell);
+  LConsuntiveDateTime := CalcConsuntiveTime(ACell);
+
+  //controllo che le date non siano precedenti alla giornata di oggi
+  if (LConsuntiveDatePieces <= 0) or (LConsuntiveDateTime <= 0) then
+    raise Exception.Create(MAINTENANCE_BEFORE_NOW);
+
+  //il risultato sarà la data piu piccola tra le 2 calcolate
+  Result := Min(LConsuntiveDatePieces, LConsuntiveDateTime);
+
+
+  //trovare quanti pezzi posso fare prima della manutenzione := LPiecesToNextMaintenance
+  //confrontarli con i pezzi che dovranno essere fatti nel futuro in base agli ordini di produzione
+  //salvo all interno della cella una lista degli ordini di produzione,
+  //dopodichè li sommo uno a uno e quando arrivo all ordine che supera i pezzi,
+  //segno la data di fine dell ordine di produzione precedente
+  //cosi da inserire la manutenzione tra 2 ordini di produzione
+
+  //nel caso non sia necessario inserire la manutenzione tra 2 ordini di produzione
+  //mi basterà prendere la data di inizio dell ordine di produzione
+
+  //implementare il calcolo dei previsionali + cambiare metodo di calcolo della data
+  //ovvero controllo giorno per giorno
+
+
+end;
+
+function TPredictiveAlgorithm.GetPiecesAnHour(
+  APartials: TList<TPartialModel>): Double;
+var
+  I: integer;
+  LMedian: Double;
+begin
+  LMedian := 0;
+  for I := 0 to APartials.Count - 1 do
+  begin
+    if APartials[I].WorkHours <> 0 then
+      LMedian := LMedian + (APartials[I].Quantity / APartials[I].WorkHours);
+  end;
+  Result := LMedian / APartials.Count;
+end;
+
+function TPredictiveAlgorithm.GetTotalPiecesMade(
+  APartials: TList<TPartialModel>): Double;
+var
+  I: integer;
+  LTotalPiecesMade: Double;
+begin
+  LTotalPiecesMade := 0;
+  for I := 0 to APartials.Count - 1 do
+  begin
+    LTotalPiecesMade := LTotalPiecesMade + APartials.Items[I].Quantity;
+  end;
+  Result := LTotalPiecesMade;
+end;
+
+end.

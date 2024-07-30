@@ -30,7 +30,7 @@ type
     function GetCellModel(ACellId: integer): TCellDataModel;
   public
     {Public declarations}
-    function GetMaintenanceDate(ACellId: integer): TList<Double>;
+    function GetMaintenanceDate(ACellId: integer): Extended;
 
   end;
 
@@ -40,16 +40,9 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
-function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<Double>;
+function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): Extended;
 begin
   Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
-end;
-
-function TPredictiveMaintenance.GetCellModel(
-  ACellId: integer): TCellDataModel;
-begin
-  //funzione che popola i dati del modello tramite querySQL
-  Result := QueryHandler.PopulateCellModel(ACellId);
 end;
 
 function TPredictiveMaintenance.GetPredictiveAlgorithm: TPredictiveAlgorithm;
@@ -71,6 +64,13 @@ begin
   if not Assigned(FQueryHandler) then
     FQueryHandler := TQueryHandler.Create;
   Result:= FQueryHandler;
+end;
+
+function TPredictiveMaintenance.GetCellModel(
+  ACellId: integer): TCellDataModel;
+begin
+  //funzione che popola i dati del modello tramite querySQL
+  Result := QueryHandler.PopulateCellModel(ACellId);
 end;
 
 end.

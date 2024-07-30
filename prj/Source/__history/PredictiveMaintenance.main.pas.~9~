@@ -14,7 +14,6 @@ type
     btnGetMaintenanceDate: TButton;
     edtMaintenanceDate: TEdit;
     lblMaintenanceDate: TLabel;
-    lbMaintenanceDates: TListBox;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -37,28 +36,14 @@ implementation
 {$R *.dfm}
 
 uses
-  PredictiveMaintenanceRT.Constants, System.Generics.Collections;
+  PredictiveMaintenanceRT.Constants;
 
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
 var
   LDate: TDateTime;
-  LDoubleList: TList<Double>;
-  LDateList: TList<TDateTime>;
-  I: Integer;
 begin
-  LDoubleList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
-
-  for I := 0 to LDateList.Count do
-  begin
-    LDateList.Add(FloatToDateTime(LDoubleList[I]));
-    lbMaintenanceDates.Items.Add(DateTimeToStr(LDateList[I]));
-  end;
-
-
-
-
-//  LDate := FloatToDateTime(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
-//  edtMaintenanceDate.Text := DateTimeToStr(LDate);
+  LDate := FloatToDateTime(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
+  edtMaintenanceDate.Text := DateTimeToStr(LDate);
 end;
 
 procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);
@@ -79,4 +64,5 @@ begin
     FPredictiveMaintenance := TPredictiveMaintenance.Create;
   Result := FPredictiveMaintenance;
 end;
+
 end.

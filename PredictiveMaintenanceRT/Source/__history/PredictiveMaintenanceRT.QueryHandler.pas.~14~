@@ -153,6 +153,7 @@ begin
       LProductionOrder := TProductionOrderModel.Create;
       LProductionOrder.POID := AQuery.FieldByName(PO_ID).AsInteger;
       LProductionOrder.Pieces := AQuery.FieldByName(PO_PIECES).AsFloat;
+      LProductionOrder.HourlyProduction := AQuery.FieldByName(PO_PRDHOURS).AsFloat;
       LProductionOrder.WorkHours := AQuery.FieldByName(PO_WORKHOURS).AsFloat;
       Result.Add(LProductionOrder);
       AQuery.Next;
