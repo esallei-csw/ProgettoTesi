@@ -57,25 +57,16 @@ begin
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
 
-  LWorkHours := LProductionOrderList[LPOIter].WorkHours;
   while true do
   begin
+    LWorkHours := LProductionOrderList[LPOIter].WorkHours;
     AThreshold := AThreshold - WorkHoursCalculator.GetWorkHours(Result);
     LWorkHours := LWorkHours - WorkHoursCalculator.GetWorkHours(Result);
 
     if AThreshold <= 0 then
       exit;
-    if LWorkHours <= 0 then
-    begin
-      if LPOIter = LProductionOrderList.Count - 1 then
-      begin
-        Result := 100000;
-        exit;
-      end;
+    if LProductionOrderList[LPOIter].WorkHours <= 0 then
       LPOIter := LPOIter + 1;
-      LWorkHours := LProductionOrderList[LPOIter].WorkHours;
-
-    end;
     if not Assigned(LProductionOrderList[LPOIter]) then
       raise Exception.Create(FINISHED_PO);
 

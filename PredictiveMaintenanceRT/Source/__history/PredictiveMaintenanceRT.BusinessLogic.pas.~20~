@@ -48,6 +48,7 @@ end;
 function TPredictiveMaintenance.GetCellModel(
   ACellId: integer): TCellDataModel;
 begin
+  //funzione che popola i dati del modello tramite querySQL
   Result := QueryHandler.PopulateCellModel(ACellId);
 end;
 
