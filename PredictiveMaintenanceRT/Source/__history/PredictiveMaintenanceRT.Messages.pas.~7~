@@ -16,8 +16,6 @@ resourcestring
 
   FINISHED_PO = 'Finiti gli ordini di produzione';
 
-  PO_ERROR = 'Populate Production Orders Error';
-
 implementation
 
 end.

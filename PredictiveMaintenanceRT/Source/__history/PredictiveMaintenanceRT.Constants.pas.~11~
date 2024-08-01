@@ -19,7 +19,6 @@ const
   PARTIAL_WORKHOURS = 'TempoLavoroInOre';
   PARTIAL_END = 'Fine';
   PARTIAL_QUANTITY = 'QtOut';
-  PARTIAL_IDARTICO = 'IDARTICO';
 
   PO_ID = 'IDOrdineProduzione';
   PO_PIECES = 'QTAOP';
@@ -36,13 +35,13 @@ const
   MAINTENANCE_QTA = 'QTA';
   MAINTENANCE_HOURS = 'TempoInOre';
 
-  QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut, IDARTICO from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
+  QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
   QUERY_MAINTENANCE = 'select IDCELPRO, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI where IDCELPRO = %s';
-  QUERY_PHASES = 'SELECT OPTES.ID as IDOrdineProduzione, OPTES.STATO, OPSDLFAS.ID as IDFase, LAVORAZIONI.IDCELPRO as IDCella, OPTES.IDARTICO as IDArticolo, OPTES.QTAOP, OPSDLFAS.TEMESE*24 as TempoLavoroInOreTeorico, OPTES.DATRIC as DataRichiesta '+
-                'from OPTES '+
-                'left join OPSDLFAS on OPTES.ID = OPSDLFAS.IDOPTES '+
-                'left join LAVORAZIONI on LAVORAZIONI.ID = OPSDLFAS.IDLAV '+
-                'where (LAVORAZIONI.IDCELPRO = %s) and ((OPTES.STATO = ''C'') or (OPTES.STATO = ''M'')) '+
+  QUERY_PHASES = 'SELECT OPTES.ID as IDOrdineProduzione, OPTES.STATO, OPSDLFAS.ID as IDFase, LAVORAZIONI.IDCELPRO as IDCella, OPTES.IDARTICO as IDArticolo, OPTES.QTAOP, OPSDLFAS.TEMESE*24 as TempoLavoroInOreTeorico, OPTES.DATRIC as DataRichiesta'+
+                'from OPTES'+
+                'left join OPSDLFAS on OPTES.ID = OPSDLFAS.IDOPTES'+
+                'left join LAVORAZIONI on LAVORAZIONI.ID = OPSDLFAS.IDLAV'+
+                'where (LAVORAZIONI.IDCELPRO = %s) and ((OPTES.STATO = ''C'') or (OPTES.STATO = ''M''))'+
                 'order by OPTES.DATRIC asc';
 
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +

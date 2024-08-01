@@ -50,8 +50,7 @@ contains
   PredictiveMaintenanceRT.QueryHandler in 'Source\PredictiveMaintenanceRT.QueryHandler.pas',
   PredictiveMaintenanceRT.MaintenanceModel in 'Source\PredictiveMaintenanceRT.MaintenanceModel.pas',
   PredictiveMaintenanceRT.WorkHoursCalculator in 'Source\PredictiveMaintenanceRT.WorkHoursCalculator.pas',
-  PredictiveMaintenanceRT.ProductionOrderModel in 'Source\PredictiveMaintenanceRT.ProductionOrderModel.pas',
-  PredictiveMaintenanceRT.PhaseModel in 'Source\PredictiveMaintenanceRT.PhaseModel.pas';
+  PredictiveMaintenanceRT.ProductionOrderModel in 'Source\PredictiveMaintenanceRT.ProductionOrderModel.pas';
 
 end.
 

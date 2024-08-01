@@ -4,8 +4,7 @@ interface
 
 uses
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel, Data.Win.ADODB, System.Generics.Collections,
-  PredictiveMaintenanceRT.QueryExecutor, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel,
-  PredictiveMaintenanceRT.PhaseModel;
+  PredictiveMaintenanceRT.QueryExecutor, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel;
 
 type
   TQueryHandler = class
@@ -16,14 +15,11 @@ type
 
     function QueryToList(AQuery : TADOQuery): TList<TPartialModel>;
     function QueryToMaintenanceData(AQuery: TADOQuery): TList<TMaintenanceModel>;
-    function QueryToPhaseList(AQuery: TADOQuery): TList<TPhaseModel>;
+    function QueryToListProductionOrder(AQuery: TADOQuery): TList<TProductionOrderModel>;
 
     function PopulatePartials(ACellId: integer; ALastMaintenance: Extended): TList<TPartialModel>;
     function PopulateMaintenanceData(ACellId: integer): TList<TMaintenanceModel>;
-    function PopulateProductionOrders(APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
-
-    function GetPhaseList(ACellId: integer): TList<TPhaseModel>;
-    procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
+    function PopulateProductionOrders(ACellId: integer): TList<TProductionOrderModel>;
 
     function GetQueryExecutor: TQueryExecutor;
     property QueryExecutor: TQueryExecutor read GetQueryExecutor write FQueryExecutor;
@@ -38,21 +34,6 @@ implementation
 { TQueryHandler }
 uses
   PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages;
-
-function TQueryHandler.GetPhaseList(ACellId: integer): TList<TPhaseModel>;
-var
-  LQuery: TADOQuery;
-begin
-  try
-    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_PHASES ,[IntToStr(ACellId)]));
-    if LQuery <> nil then
-      Result := QueryToPhaseList(LQuery)
-    else
-      raise Exception.Create(SQL_DATA_NOTFOUND);
-  finally
-    LQuery.Free;
-  end;
-end;
 
 function TQueryHandler.GetQueryExecutor: TQueryExecutor;
 begin
@@ -71,9 +52,7 @@ begin
 
     Result.Partials := PopulatePartials(ACellId, Result.MaintenanceData[0].LastMaintenance);
 
-    Result.ProductionOrders := PopulateProductionOrders(GetPhaseList(ACellId));
-
-    WorkHoursSum(Result.ProductionOrders);
+    Result.ProductionOrders := PopulateProductionOrders(ACellId);
   except
     begin
       Result.Free;
@@ -115,29 +94,20 @@ begin
 end;
 
 function TQueryHandler.PopulateProductionOrders(
-  APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
+  ACellId: integer): TList<TProductionOrderModel>;
 var
-  LPhase: TPhaseModel;
-  LProductionOrder: TProductionOrderModel;
+  LQuery: TADOQuery;
 begin
-  Result := TList<TProductionOrderModel>.Create;
   try
-  LProductionOrder := TProductionOrderModel.Create;
+    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_PRODUCTION_ORDERS, [intToStr(ACellId)]));
+    if LQuery <> nil then
+      Result := QueryToListProductionOrder(LQuery)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+  finally
+    LQuery.Free;
+  end;
 
-  for LPhase in APhases do
-  begin
-    if LPhase.POID <> LProductionOrder.POID then
-    begin
-      LProductionOrder := TProductionOrderModel.Create;
-      LProductionOrder.POID := LPhase.POID;
-      Result.Add(LProductionOrder);
-    end;
-    LProductionOrder.Phases.Add(LPhase);
-  end;
-  except
-    Result.Free;
-    raise Exception.Create(PO_ERROR);
-  end;
 end;
 
 function TQueryHandler.QueryToList(AQuery: TADOQuery): TList<TPartialModel>;
@@ -157,8 +127,34 @@ begin
       LPartial.WorkHours := AQuery.FieldByName(PARTIAL_WORKHOURS).AsFloat;
       LPartial.EndTime := AQuery.FieldByName(PARTIAL_END).AsFloat;
       LPartial.Quantity := AQuery.FieldByName(PARTIAL_QUANTITY).AsFloat;
-      LPartial.IDArtico := AQuery.FieldByName(PARTIAL_IDARTICO).AsInteger;
       Result.Add(LPartial);
+      AQuery.Next;
+    end;
+  except
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
+
+function TQueryHandler.QueryToListProductionOrder(
+  AQuery: TADOQuery): TList<TProductionOrderModel>;
+var
+  LProductionOrder: TProductionOrderModel;
+begin
+  Result := TList<TProductionOrderModel>.Create;
+  try
+    if not AQuery.Active then
+      raise Exception.Create(DATASET_CLOSED);
+    AQuery.First;
+    while not AQuery.Eof do
+    begin
+      LProductionOrder := TProductionOrderModel.Create;
+      LProductionOrder.POID := AQuery.FieldByName(PO_ID).AsInteger;
+      LProductionOrder.Pieces := AQuery.FieldByName(PO_PIECES).AsFloat;
+      LProductionOrder.WorkHours := AQuery.FieldByName(PO_WORKHOURS).AsFloat;
+      Result.Add(LProductionOrder);
       AQuery.Next;
     end;
   except
@@ -194,48 +190,6 @@ begin
     begin
       Result.Free;
       raise;
-    end;
-  end;
-end;
-
-function TQueryHandler.QueryToPhaseList(AQuery: TADOQuery): TList<TPhaseModel>;
-var
-  LPhase: TPhaseModel;
-begin
-  Result := TList<TPhaseModel>.Create;
-  try
-    if not AQuery.Active then
-      raise Exception.Create(DATASET_CLOSED);
-    AQuery.First;
-    while not AQuery.Eof do
-    begin
-      LPhase := TPhaseModel.Create;
-      LPhase.POID := AQuery.FieldByName(PO_ID).AsInteger;
-      LPhase.PhaseID := AQuery.FieldByName(PHASE_ID).AsInteger;
-      LPhase.ArticleID := AQuery.FieldByName(ARTICO_ID).AsInteger;
-      LPhase.WorkTime := AQuery.FieldByName(PHASE_WORKTIME).AsFloat;
-      LPhase.Quantity := AQuery.FieldByName(PO_PIECES).AsFloat;
-      Result.Add(LPhase);
-      AQuery.Next;
-    end;
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
-  end;
-end;
-
-procedure TQueryHandler.WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
-var
-  LProductionOrder: TProductionOrderModel;
-  LPhase: TPhaseModel;
-begin
-  for LProductionOrder in AProductionOrders do
-  begin
-    for LPhase in LProductionOrder.Phases do
-    begin
-      LProductionOrder.WorkHours := LProductionOrder.WorkHours + LPhase.WorkTime;
     end;
   end;
 end;

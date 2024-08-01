@@ -2,9 +2,6 @@ unit PredictiveMaintenanceRT.ProductionOrderModel;
 
 interface
 
-uses
-  system.Generics.Collections, PredictiveMaintenanceRT.PhaseModel;
-
 type
   TProductionOrderModel = class
     private
@@ -12,17 +9,14 @@ type
     FPOID: integer;
     FPieces: Double;
     FWorkHours: Double;
-    FPhases: TList<TPhaseModel>;
 
     public
     {Public declarations}
     constructor Create;
-    destructor Destroy; override;
 
     property POID: integer read FPOID write FPOID;
     property Pieces: Double read FPieces write FPieces;
     property WorkHours: Double read FWorkHours write FWorkHours;
-    property Phases: TList<TPhaseModel> read FPhases write FPhases;
   end;
 
 implementation
@@ -34,13 +28,6 @@ begin
   FPOID := varEmpty;
   FPieces := varEmpty;
   FWorkHours := varEmpty;
-  FPhases := TList<TPhaseModel>.Create;
-end;
-
-destructor TProductionOrderModel.Destroy;
-begin
-  FPhases.Free;
-  inherited;
 end;
 
 end.

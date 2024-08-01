@@ -10,7 +10,6 @@ type
     FEndTime: Double;
     FWorkHours: Double;
     FQuantity: Double;
-    FIDArtico: integer;
   public
     constructor Create;
 
@@ -19,7 +18,6 @@ type
     property EndTime: Double read FEndTime write FEndTime;
     property WorkHours: Double read FWorkHours write FWorkHours;
     property Quantity: Double read FQuantity write FQuantity;
-    property IDArtico: integer read FIDArtico write FIDArtico;
   end;
 
 implementation
@@ -33,7 +31,6 @@ begin
   FEndTime := varEmpty;
   FWorkHours := varEmpty;
   FQuantity := varEmpty;
-  FIDArtico := varEmpty;
 end;
 
 end.
