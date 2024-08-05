@@ -7,7 +7,6 @@ type
 
   private
   {Private declarations}
-    FDescription: string;
     FThresholdPieces: integer;
     FThresholdHoursWorked: Double;
     FThresholdDays: Integer;
@@ -17,7 +16,6 @@ type
   public
   {Public declarations}
     constructor Create;
-    property Description: string read FDescription write FDescription;
     property ThresholdPieces: integer read FThresholdPieces write FThresholdPieces;
     property ThresholdHoursWorked: Double read FThresholdHoursWorked write FThresholdHoursWorked;
     property ThresholdDays: Integer read FThresholdDays write FThresholdDays;
@@ -45,7 +43,6 @@ end;
 
 constructor TMaintenanceModel.Create;
 begin
-  FDescription := '';
   FThresholdPieces := varEmpty;
   FThresholdHoursWorked := varEmpty;
   FThresholdDays := varEmpty;

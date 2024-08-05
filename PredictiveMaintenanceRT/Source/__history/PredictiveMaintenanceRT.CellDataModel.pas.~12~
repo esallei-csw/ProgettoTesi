@@ -13,7 +13,6 @@ type
     FMaintenanceData: TList<TMaintenanceModel>;
     FPartials: TList<TPartialModel>;
     FProductionOrders: TList<TProductionOrderModel>;
-    FTotalPartials: TList<TPartialModel>;
 
 
     public
@@ -28,8 +27,6 @@ type
 
     property ProductionOrders: TList<TProductionOrderModel> read FProductionOrders write FProductionOrders;
 
-    property TotalPartials: TList<TPartialModel> read FTotalPartials write FTotalPartials;
-
 
   end;
 
@@ -43,7 +40,6 @@ begin
   FMaintenanceData := TList<TMaintenanceModel>.Create;
   FPartials := TList<TPartialModel>.Create;
   FProductionOrders := TList<TProductionOrderModel>.Create;
-  FTotalPartials := TList<TPartialModel>.Create;
 end;
 
 destructor TCellDataModel.Destroy;
@@ -51,7 +47,6 @@ begin
   FMaintenanceData.Free;
   FPartials.Free;
   FProductionOrders.Free;
-  FTotalPartials.Free;
   inherited;
 end;
 

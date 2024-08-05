@@ -6,7 +6,7 @@ uses
   PredictiveMaintenanceRT.BusinessLogicInterface, PredictiveMaintenanceRT.PredictiveAlgorithm,
   PredictiveMaintenanceRT.CellDataModel,
   PredictiveMaintenanceRT.PartialModel, Data.DB, System.Generics.Collections,
-  Data.Win.ADODB, PredictiveMaintenanceRT.QueryHandler, PredictiveMaintenanceRT.ResultModel;
+  Data.Win.ADODB, PredictiveMaintenanceRT.QueryHandler;
 
 type
   TPredictiveMaintenance = class(TInterfacedObject, IPredictiveMaintenance)
@@ -26,7 +26,7 @@ type
     function GetCellModel(ACellId: integer): TCellDataModel;
   public
     {Public declarations}
-    function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+    function GetMaintenanceDate(ACellId: integer): TList<Double>;
 
   end;
 
@@ -36,7 +36,7 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
-function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<Double>;
 begin
   Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
 end;

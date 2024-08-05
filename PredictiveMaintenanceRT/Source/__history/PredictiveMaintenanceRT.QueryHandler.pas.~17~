@@ -206,7 +206,6 @@ begin
     while not AQuery.Eof do
     begin
       LMaintenanceData := TMaintenanceModel.Create;
-      LMaintenanceData.Description := AQuery.FieldByName(MAINTENANCE_DESCR).AsString;
       LMaintenanceData.LastMaintenance := AQuery.FieldByName(ULTMAN).AsFloat;
       LMaintenanceData.ThresholdPieces := AQuery.FieldByName(MAINTENANCE_QTA).AsInteger;
       LMaintenanceData.ThresholdHoursWorked := AQuery.FieldByName(MAINTENANCE_HOURS).AsFloat;

@@ -12,16 +12,18 @@ type
     edtCellId: TEdit;
     lblCellId: TLabel;
     btnGetMaintenanceDate: TButton;
-    edtMaintenanceDate: TEdit;
     lblMaintenanceDate: TLabel;
+    lbMaintenanceDates: TListBox;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
-    FPredictiveMaintenance: IPredictiveMaintenance;
+    FPredictiveMaintenance: TPredictiveMaintenance;
 
-    function GetPredictiveMaintenance: IPredictiveMaintenance;
-    property PredictiveMaintenance: IPredictiveMaintenance read GetPredictiveMaintenance write FPredictiveMaintenance;
+
+    function GetPredictiveMaintenance: TPredictiveMaintenance;
+    property PredictiveMaintenance: TPredictiveMaintenance read GetPredictiveMaintenance write FPredictiveMaintenance;
   public
     { Public declarations }
   end;
@@ -34,26 +36,37 @@ implementation
 {$R *.dfm}
 
 uses
-  PredictiveMaintenanceRT.Constants;
+  PredictiveMaintenanceRT.Constants, System.Generics.Collections;
 
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
 var
-  LDate: TDate;
+  LDoubleList: TList<Double>;
+  I: Integer;
 begin
-  LDate := FloatToDateTime(PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text)));
-  edtMaintenanceDate.Text := DateTimeToStr(LDate);
+  LDoubleList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
+  for I := 0 to LDoubleList.Count - 1 do
+  begin
+    lbMaintenanceDates.Items.Add(DateTimeToStr(FloatToDateTime(LDoubleList[I])));
+  end;
+
 end;
 
 procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);
 begin
   edtCellId.Text := inttostr(DEFAULT_CELLID);
+  FPredictiveMaintenance := nil;
 end;
 
-function TfrmPredictiveMaintenance.GetPredictiveMaintenance: IPredictiveMaintenance;
+procedure TfrmPredictiveMaintenance.FormDestroy(Sender: TObject);
+begin
+  if Assigned(FPredictiveMaintenance) then
+    FPredictiveMaintenance.Free;
+end;
+
+function TfrmPredictiveMaintenance.GetPredictiveMaintenance: TPredictiveMaintenance;
 begin
   if not Assigned(FPredictiveMaintenance) then
     FPredictiveMaintenance := TPredictiveMaintenance.Create;
   Result := FPredictiveMaintenance;
 end;
-
 end.

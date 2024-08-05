@@ -2,8 +2,8 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   Left = 0
   Top = 0
   Caption = 'Predictive Maintenance'
-  ClientHeight = 422
-  ClientWidth = 556
+  ClientHeight = 364
+  ClientWidth = 640
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -29,13 +29,6 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
     Height = 13
     Caption = 'Maintenance Dates'
   end
-  object lblWarningList: TLabel
-    Left = 151
-    Top = 208
-    Width = 59
-    Height = 13
-    Caption = 'Warning List'
-  end
   object edtCellId: TEdit
     Left = 24
     Top = 40
@@ -53,41 +46,28 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
     TabOrder = 1
     OnClick = btnGetMaintenanceDateClick
   end
+  object lbMaintenanceDates: TListBox
+    Left = 151
+    Top = 203
+    Width = 386
+    Height = 153
+    ItemHeight = 13
+    TabOrder = 2
+  end
   object cbUsePastData: TCheckBox
     Left = 24
     Top = 68
     Width = 97
     Height = 17
     Caption = 'Use Past Data'
-    TabOrder = 2
+    TabOrder = 3
   end
   object lvMaintenanceDates: TListView
     Left = 151
     Top = 40
     Width = 386
     Height = 157
-    Columns = <
-      item
-        AutoSize = True
-        Caption = 'Description'
-      end
-      item
-        Caption = 'Maintenance Date'
-        Width = 150
-      end
-      item
-        Caption = 'Calc %'
-      end>
-    TabOrder = 3
-    ViewStyle = vsReport
-    OnSelectItem = lvMaintenanceDatesSelectItem
-  end
-  object lbWarningList: TListBox
-    Left = 151
-    Top = 227
-    Width = 386
-    Height = 153
-    ItemHeight = 13
+    Columns = <>
     TabOrder = 4
   end
 end

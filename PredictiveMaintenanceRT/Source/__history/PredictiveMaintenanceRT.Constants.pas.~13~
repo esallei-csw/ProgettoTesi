@@ -35,10 +35,9 @@ const
   MESI = 'MESI';
   MAINTENANCE_QTA = 'QTA';
   MAINTENANCE_HOURS = 'TempoInOre';
-  MAINTENANCE_DESCR = 'Descrizione';
 
   QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut, IDARTICO from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
-  QUERY_MAINTENANCE = 'select IDCELPRO, VARDB.DESCR as Descrizione, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI left join VARDB on MANUTENZIONI.IDARTICO = VARDB.IDARTICO where IDCELPRO = %s';
+  QUERY_MAINTENANCE = 'select IDCELPRO, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI where IDCELPRO = %s';
   QUERY_PHASES = 'SELECT OPTES.ID as IDOrdineProduzione, OPTES.STATO, OPSDLFAS.ID as IDFase, LAVORAZIONI.IDCELPRO as IDCella, OPTES.IDARTICO as IDArticolo, OPTES.QTAOP, OPSDLFAS.TEMESE*24 as TempoLavoroInOreTeorico, OPTES.DATRIC as DataRichiesta '+
                 'from OPTES '+
                 'left join OPSDLFAS on OPTES.ID = OPSDLFAS.IDOPTES '+

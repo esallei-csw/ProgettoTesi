@@ -11,6 +11,8 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
+  OnCreate = FormCreate
+  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
   object lblCellId: TLabel
@@ -23,9 +25,9 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   object lblMaintenanceDate: TLabel
     Left = 151
     Top = 21
-    Width = 87
+    Width = 92
     Height = 13
-    Caption = 'Maintenance Date'
+    Caption = 'Maintenance Dates'
   end
   object edtCellId: TEdit
     Left = 24
@@ -42,13 +44,14 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
     Height = 54
     Caption = 'Get Maintenance Date'
     TabOrder = 1
+    OnClick = btnGetMaintenanceDateClick
   end
-  object edtMaintenanceDate: TEdit
+  object lbMaintenanceDates: TListBox
     Left = 151
     Top = 40
-    Width = 121
-    Height = 21
+    Width = 274
+    Height = 153
+    ItemHeight = 13
     TabOrder = 2
-    Text = 'Maintenance Date'
   end
 end

@@ -29,7 +29,14 @@ package PredictiveMaintenanceRT;
 
 requires
   rtl,
-  dbrtl;
+  vcl,
+  dbrtl,
+  vclFireDAC,
+  FireDAC,
+  FireDACCommonDriver,
+  FireDACCommon,
+  FireDACCommonODBC,
+  FireDACMSSQLDriver;
 
 contains
   PredictiveMaintenanceRT.BusinessLogic in 'Source\PredictiveMaintenanceRT.BusinessLogic.pas',
@@ -44,11 +51,9 @@ contains
   PredictiveMaintenanceRT.MaintenanceModel in 'Source\PredictiveMaintenanceRT.MaintenanceModel.pas',
   PredictiveMaintenanceRT.WorkHoursCalculator in 'Source\PredictiveMaintenanceRT.WorkHoursCalculator.pas',
   PredictiveMaintenanceRT.ProductionOrderModel in 'Source\PredictiveMaintenanceRT.ProductionOrderModel.pas',
-  PredictiveMaintenanceRT.PhaseModel in 'Source\PredictiveMaintenanceRT.PhaseModel.pas',
-  PredictiveMaintenanceRT.ResultModel in 'Source\PredictiveMaintenanceRT.ResultModel.pas';
+  PredictiveMaintenanceRT.PhaseModel in 'Source\PredictiveMaintenanceRT.PhaseModel.pas';
 
 end.
-
 
 
 

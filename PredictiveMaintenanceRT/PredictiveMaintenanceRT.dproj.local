@@ -14,13 +14,13 @@
     <Transaction>2024/07/17 10:14:12.000.851,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/17 10:15:33.000.505,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Constants.pas</Transaction>
     <Transaction>2024/07/17 10:17:51.000.336,=FireDACCommonDriver.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.279,=dbrtl.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.319,=FireDAC.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.355,=FireDACCommon.dcp</Transaction>
-    <Transaction>2024/07/17 10:17:51.000.296,=vclFireDAC.dcp</Transaction>
     <Transaction>2024/07/17 10:17:51.000.261,=vcl.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.319,=FireDAC.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.296,=vclFireDAC.dcp</Transaction>
     <Transaction>2024/07/17 10:17:51.000.381,=FireDACCommonODBC.dcp</Transaction>
     <Transaction>2024/07/17 10:17:51.000.397,=FireDACMSSQLDriver.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.355,=FireDACCommon.dcp</Transaction>
+    <Transaction>2024/07/17 10:17:51.000.279,=dbrtl.dcp</Transaction>
     <Transaction>2024/07/17 10:19:58.000.809,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/17 10:20:32.000.085,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.Messages.pas</Transaction>
     <Transaction>2024/07/17 11:02:34.000.340,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
@@ -40,6 +40,13 @@
     <Transaction>2024/07/29 16:09:06.253,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.ProductionOrderModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.ProductionOrder.pas</Transaction>
     <Transaction>2024/07/31 10:05:03.597,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
     <Transaction>2024/07/31 10:05:32.994,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.PhaseModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/08/02 13:32:02.316,=rtl.dcp</Transaction>
+    <Transaction>2024/08/02 13:32:02.360,=dbrtl.dcp</Transaction>
+    <Transaction>2024/08/02 13:32:02.410,=FireDAC.dcp</Transaction>
+    <Transaction>2024/08/02 13:32:02.483,=FireDACCommonDriver.dcp</Transaction>
+    <Transaction>2024/08/02 13:32:02.547,=FireDACCommon.dcp</Transaction>
+    <Transaction>2024/08/02 16:16:04.358,=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
+    <Transaction>2024/08/02 16:18:35.108,C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Source\PredictiveMaintenanceRT.ResultModel.pas=C:\Sviluppo\ProgettoTesi\PredictiveMaintenanceRT\Unit1.pas</Transaction>
   </Transactions>
 	<ProjectSortOrder AutoSort="0" SortType="0">
     <File Path="Source"/>
@@ -56,14 +63,8 @@
     <File Path="Source\PredictiveMaintenanceRT.QueryHandler.pas"/>
     <File Path="Source\PredictiveMaintenanceRT.WorkHoursCalculator.pas"/>
     <File Path="Source\PredictiveMaintenanceRT.PhaseModel.pas"/>
-    <File Path="dbrtl.dcp"/>
-    <File Path="FireDAC.dcp"/>
-    <File Path="FireDACCommon.dcp"/>
-    <File Path="FireDACCommonDriver.dcp"/>
-    <File Path="FireDACCommonODBC.dcp"/>
-    <File Path="FireDACMSSQLDriver.dcp"/>
+    <File Path="Source\PredictiveMaintenanceRT.ResultModel.pas"/>
     <File Path="rtl.dcp"/>
-    <File Path="vcl.dcp"/>
-    <File Path="vclFireDAC.dcp"/>
+    <File Path="dbrtl.dcp"/>
   </ProjectSortOrder>
 </BorlandProject>

@@ -18,10 +18,6 @@ resourcestring
 
   PO_ERROR = 'Populate Production Orders Error';
 
-  WARNINGLIST = 'Warning List ';
-
-  NOT_ENOUGH_PO = 'Not enough Production Orders to complete calculation';
-
 implementation
 
 end.

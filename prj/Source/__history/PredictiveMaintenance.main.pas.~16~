@@ -5,8 +5,7 @@ interface
 uses
   Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
   Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, PredictiveMaintenanceRT.BusinessLogicInterface,
-  PredictiveMaintenanceRT.BusinessLogic, Vcl.ComCtrls, PredictiveMaintenanceRT.ResultModel
-  , System.Generics.Collections;
+  PredictiveMaintenanceRT.BusinessLogic, Vcl.ComCtrls;
 
 type
   TfrmPredictiveMaintenance = class(TForm)
@@ -14,18 +13,14 @@ type
     lblCellId: TLabel;
     btnGetMaintenanceDate: TButton;
     lblMaintenanceDate: TLabel;
+    lbMaintenanceDates: TListBox;
     cbUsePastData: TCheckBox;
     lvMaintenanceDates: TListView;
-    lbWarningList: TListBox;
-    lblWarningList: TLabel;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem;
-      Selected: Boolean);
   private
     { Private declarations }
-    FResultList: TList<TResultModel>;
     FPredictiveMaintenance: TPredictiveMaintenance;
 
 
@@ -43,24 +38,24 @@ implementation
 {$R *.dfm}
 
 uses
-  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
+  PredictiveMaintenanceRT.Constants, System.Generics.Collections, PredictiveMaintenanceRT.ResultModel;
 
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
 var
+  LResultList: TList<TResultModel>;
   LListItem: TListItem;
   LResultItem: TResultModel;
 begin
-  FResultList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
+  LResultList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
 
   lvMaintenanceDates.Items.BeginUpdate;
 
   try
     lvMaintenanceDates.Items.Clear;
-    for LResultItem in FResultList do
+    for LResultItem in LResultList do
     begin
       LListItem := lvMaintenanceDates.Items.Add;
-      LListItem.Caption := LResultItem.Description;
-      LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
+      LListItem.Caption := DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate));
       LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
       LListItem.SubItems.Add(LResultItem.WarningList.ToString);
     end;
@@ -87,15 +82,4 @@ begin
     FPredictiveMaintenance := TPredictiveMaintenance.Create;
   Result := FPredictiveMaintenance;
 end;
-procedure TfrmPredictiveMaintenance.lvMaintenanceDatesSelectItem(
-  Sender: TObject; Item: TListItem; Selected: Boolean);
-var
-  LWarningString: string;
-begin
-  lblWarningList.Caption := WARNINGLIST + FResultList[item.Index].Description;
-  lbWarningList.Items.Clear;
-  for LWarningString in FResultList[Item.Index].WarningList do
-    lbWarningList.Items.Add(LWarningString);
-end;
-
 end.
