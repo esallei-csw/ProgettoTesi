@@ -57,7 +57,6 @@ var
   LCountPerc: Double;
 begin
   Result := TResultModel.Create;
-  Result.WarningList.Add(TIME_CALC);
   Result.MaintenanceDate := now;
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
@@ -98,7 +97,6 @@ end;
 function TPredictiveAlgorithm.CalcDateDays(AThreshold: Double; ACell: TCellDataModel): TResultModel;
 begin
   Result := TResultModel.Create;
-  Result.WarningList.Add(DAYS_CALC);
   Result.MaintenanceDate := now + AThreshold;
   Result.Percent := 100;
 end;
@@ -115,7 +113,6 @@ var
   LCountPerc: Double;
 begin
   Result := TResultModel.Create;
-  Result.WarningList.Add(PIECES_CALC);
   Result.MaintenanceDate:= now;
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
@@ -131,7 +128,7 @@ begin
     if (LWorkHours = 0) and (UsePastData) then
     begin
       LWorkHours := (LProductionOrderList[LPOIter].Pieces * GetMedianHoursPerPiece(ACell.TotalPartials, LProductionOrderList[LPOIter].Phases[0].ArticleID));
-      Result.WarningList.Add(USED_PAST_DATA + IntToStr(LProductionOrderList[LPOIter].POID));
+      Result.WarningList.Add('Used Past Data for PO n° ' + IntToStr(LProductionOrderList[LPOIter].POID));
       if LWorkHours <> 0 then
         Result.WarningList.Add('PastData actually used for PO n°' + IntToStr(LProductionOrderList[LPOIter].POID));
     end;
@@ -194,7 +191,7 @@ begin
       LTimeToMaintenance := GetTimeToMaintenance(ACell.Partials, LMaintenanceData);
       LResultPieces := CalcDatePieces(LPiecesToMaintenance, LMaintenanceData.ThresholdPieces, ACell);
       LResultTime := CalcDateTime(LTimeToMaintenance, LMaintenanceData.ThresholdHoursWorked, ACell);
-      if LResultPieces.MaintenanceDate < LResultTime.MaintenanceDate then
+      if LResultPieces.MaintenanceDate > LResultTime.MaintenanceDate then
         Result.Add(LResultPieces)
       else
         Result.Add(LResultTime);
