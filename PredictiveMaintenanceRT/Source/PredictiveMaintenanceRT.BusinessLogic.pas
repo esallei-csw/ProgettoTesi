@@ -27,6 +27,7 @@ type
   public
     {Public declarations}
     function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+    procedure UsePastData(AFlag: boolean);
 
   end;
 
@@ -59,6 +60,11 @@ begin
   if not Assigned(FQueryHandler) then
     FQueryHandler := TQueryHandler.Create;
   Result:= FQueryHandler;
+end;
+
+procedure TPredictiveMaintenance.UsePastData(AFlag: boolean);
+begin
+  PredictiveAlgorithm.UsePastData := AFlag;
 end;
 
 end.

@@ -44,7 +44,7 @@ const
                 'left join OPSDLFAS on OPTES.ID = OPSDLFAS.IDOPTES '+
                 'left join LAVORAZIONI on LAVORAZIONI.ID = OPSDLFAS.IDLAV '+
                 'where (LAVORAZIONI.IDCELPRO = %s) and ((OPTES.STATO = ''C'') or (OPTES.STATO = ''M'')) '+
-                'order by DataRichiesta, IDOrdineProduzione asc';
+                'order by OPTES.DATRIC asc';
   QUERY_TOTAL_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut, IDARTICO from OPSdlPar where IDCelPro = %s order by ID desc';
 
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +

@@ -50,8 +50,8 @@ var
   LListItem: TListItem;
   LResultItem: TResultModel;
 begin
-  PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
   FResultList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
+
   lvMaintenanceDates.Items.BeginUpdate;
 
   try
@@ -87,7 +87,6 @@ begin
     FPredictiveMaintenance := TPredictiveMaintenance.Create;
   Result := FPredictiveMaintenance;
 end;
-
 procedure TfrmPredictiveMaintenance.lvMaintenanceDatesSelectItem(
   Sender: TObject; Item: TListItem; Selected: Boolean);
 var

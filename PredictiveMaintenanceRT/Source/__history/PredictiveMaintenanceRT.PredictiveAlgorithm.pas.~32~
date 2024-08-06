@@ -118,8 +118,6 @@ begin
   LProductionOrderList := ACell.ProductionOrders;
   LTotPerc := ATotalThreshold;
   LCountPerc := ATotalThreshold - AThreshold;
-  LPiecesADay := 0;
-  LPiecesAnHour := 0;
 
   Lquantity := LProductionOrderList[LPOIter].Phases[0].Quantity;
   while true do
