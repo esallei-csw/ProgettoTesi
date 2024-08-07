@@ -18,11 +18,15 @@ type
     lvMaintenanceDates: TListView;
     lbWarningList: TListBox;
     lblWarningList: TLabel;
+    lbCellsList: TListBox;
+    lblCells: TLabel;
+    btnGetCellsList: TButton;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
+    procedure btnGetCellsListClick(Sender: TObject);
   private
     { Private declarations }
     FResultList: TList<TResultModel>;
@@ -45,6 +49,15 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
 
+procedure TfrmPredictiveMaintenance.btnGetCellsListClick(Sender: TObject);
+var
+  LCellId: integer;
+begin
+  lbCellsList.Items.Clear;
+  for LCellId in PredictiveMaintenance.GetCellsList do
+    lbCellsList.Items.Add(IntToStr(LCellId));
+end;
+
 procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
 var
   LListItem: TListItem;
@@ -62,7 +75,6 @@ begin
       LListItem.Caption := LResultItem.Description;
       LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
       LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
-      LListItem.SubItems.Add(LResultItem.WarningList.ToString);
     end;
   finally
       lvMaintenanceDates.Items.EndUpdate;

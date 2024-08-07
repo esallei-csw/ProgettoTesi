@@ -28,6 +28,7 @@ type
     {Public declarations}
     function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
     procedure UsePastData(AFlag: boolean);
+    function GetCellsList: TList<integer>;
 
   end;
 
@@ -40,6 +41,11 @@ uses
 function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
 begin
   Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
+end;
+
+function TPredictiveMaintenance.GetCellsList: TList<integer>;
+begin
+  Result := QueryHandler.GetCellsList;
 end;
 
 function TPredictiveMaintenance.GetCellModel(

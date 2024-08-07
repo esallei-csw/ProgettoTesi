@@ -23,7 +23,7 @@ type
     //Calc Date functions
     function CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
     function CalcDateTime(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
-    function CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
+    function CalcDateDays(AThreshold: Double; ACell: TCellDataModel): TResultModel;
 
     //Threshold functions
     function GetDaysToMaintenance(AMaintenanceData: TMaintenanceModel): Double;
@@ -57,13 +57,13 @@ var
   LCountPerc: Double;
 begin
   Result := TResultModel.Create;
+  Result.WarningList.Add(TIME_CALC);
   Result.MaintenanceDate := now;
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
   LTotPerc := ATotalThreshold;
   LCountPerc := ATotalThreshold - AThreshold;
 
-  Result.WarningList.Add(TIME_CALC);
   LWorkHours := LProductionOrderList[LPOIter].WorkHours;
   while true do
   begin
@@ -95,14 +95,11 @@ begin
   end;
 end;
 
-function TPredictiveAlgorithm.CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
+function TPredictiveAlgorithm.CalcDateDays(AThreshold: Double; ACell: TCellDataModel): TResultModel;
 begin
   Result := TResultModel.Create;
   Result.WarningList.Add(DAYS_CALC);
-  //Increment Months
-  Result.MaintenanceDate := IncMonth(ACell.MaintenanceData[AIndex].LastMaintenance, ACell.MaintenanceData[AIndex].ThresholdMonths);
-  //Increment Days
-  Result.MaintenanceDate := Result.MaintenanceDate + ACell.MaintenanceData[AIndex].ThresholdDays;
+  Result.MaintenanceDate := now + AThreshold;
   Result.Percent := 100;
 end;
 
@@ -118,6 +115,7 @@ var
   LCountPerc: Double;
 begin
   Result := TResultModel.Create;
+  Result.WarningList.Add(PIECES_CALC);
   Result.MaintenanceDate:= now;
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
@@ -126,7 +124,6 @@ begin
   LPiecesADay := 0;
   LPiecesAnHour := 0;
 
-  Result.WarningList.Add(PIECES_CALC);
   Lquantity := LProductionOrderList[LPOIter].Phases[0].Quantity;
   while true do
   begin
@@ -177,19 +174,21 @@ end;
 function TPredictiveAlgorithm.CalculateMaintenanceDate(ACell: TCellDataModel): TList<TResultModel>;
 var
   LMaintenanceData: TMaintenanceModel;
+  LDaysToMaintenance: Double;
   LPiecesToMaintenance: Double;
   LTimeToMaintenance: Double;
   LResultPieces: TResultModel;
   LResultTime: TResultModel;
   LResult: TResultModel;
-  LIndex: integer;
 begin
-  LIndex := 0;
   Result := TList<TResultModel>.Create;
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
-    if GetDaysToMaintenance(LMaintenanceData) <= 0 then
+    LDaysToMaintenance := GetDaysToMaintenance(LMaintenanceData);
+
+    //calcolo per trovare la data in basa alla soglia Giorni/Mesi
+    if LDaysToMaintenance <= 0 then
     begin
       LPiecesToMaintenance := GetPiecesToMaintenance(ACell.Partials, LMaintenanceData);
       LTimeToMaintenance := GetTimeToMaintenance(ACell.Partials, LMaintenanceData);
@@ -201,9 +200,9 @@ begin
         Result.Add(LResultTime);
     end
     else
-      Result.Add(CalcDateDays(LIndex, ACell));
-    Result[LIndex].Description := LMaintenanceData.Description;
-    LIndex := LIndex + 1;
+      Result.Add(CalcDateDays(LDaysToMaintenance, ACell));
+
+    Result[Result.Count - 1].Description := LMaintenanceData.Description;
   end;
 end;
 

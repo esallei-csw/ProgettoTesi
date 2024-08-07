@@ -1,0 +1,7 @@
+unit PredictiveMaintenanceRT.QueryUtilityHandler;
+
+interface
+
+implementation
+
+end.

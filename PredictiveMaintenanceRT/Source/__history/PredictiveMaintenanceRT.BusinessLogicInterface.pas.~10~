@@ -11,7 +11,6 @@ type
 
     function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
     procedure UsePastData(AFlag: boolean);
-    function GetCellsList: TList<integer>;
   end;
 
 implementation
