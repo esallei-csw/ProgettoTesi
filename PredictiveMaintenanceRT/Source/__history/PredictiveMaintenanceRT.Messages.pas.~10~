@@ -25,7 +25,6 @@ resourcestring
   PIECES_CALC = 'Pieces Calculation';
   TIME_CALC = 'Time Calculation';
   USED_PAST_DATA = 'Used Past Data for PO n° ';
-  ACTUALLY_USED_PAST_DATA = 'PastData actually used for PO n°';
 
 implementation
 

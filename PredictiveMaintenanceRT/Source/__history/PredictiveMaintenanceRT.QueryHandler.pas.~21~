@@ -11,6 +11,7 @@ type
   TQueryHandler = class
 
 type
+  // Definisci il tipo di funzione anonima
   TFunc<T> = reference to function(Value: TADOQuery): TList<T>;
   private
   {Private declarations}
@@ -19,7 +20,13 @@ type
 
     function PopulateCell<T>(const AQuery: string; AFunc: TFunc<T>): TList<T>;
 
+    function PopulatePartials(ACellId: integer; ALastMaintenance: Extended): TList<TPartialModel>;
+    function PopulateMaintenanceData(ACellId: integer): TList<TMaintenanceModel>;
     function PopulateProductionOrders(APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
+    function PopulateTotalPartials(ACellId: integer): TList<TPartialModel>;
+
+    function GetPhaseList(ACellId: integer): TList<TPhaseModel>;
+    procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
 
     function GetQueryExecutor: TQueryExecutor;
     property QueryExecutor: TQueryExecutor read GetQueryExecutor write FQueryExecutor;
@@ -56,6 +63,22 @@ begin
 
 end;
 
+function TQueryHandler.GetPhaseList(ACellId: integer): TList<TPhaseModel>;
+var
+  LQuery: TADOQuery;
+begin
+  LQuery := TADOQuery.Create(nil);
+  try
+    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_PHASES ,[IntToStr(ACellId)]));
+    if LQuery <> nil then
+      Result := QueryUtilityHandler.QueryToPhaseList(LQuery)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+  finally
+    LQuery.Free;
+  end;
+end;
+
 function TQueryHandler.GetQueryExecutor: TQueryExecutor;
 begin
   if not Assigned(FQueryExecutor) then
@@ -84,6 +107,16 @@ begin
 
     Result.ProductionOrders := PopulateProductionOrders(PopulateCell<TPhaseModel>(Format(QUERY_PHASES ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToPhaseList));
 
+//    Result.ProductionOrders := PopulateCell<TProductionOrderModel>();
+
+//    Result.MaintenanceData := PopulateMaintenanceData(ACellId);
+
+//    Result.Partials := PopulatePartials(ACellId, Result.MaintenanceData[0].LastMaintenance);
+
+//    Result.TotalPartials := PopulateTotalPartials(ACellId);
+
+//    Result.ProductionOrders := PopulateProductionOrders(GetPhaseList(ACellId));
+
     QueryUtilityHandler.WorkHoursSum(Result.ProductionOrders);
   except
     begin
@@ -91,6 +124,40 @@ begin
       raise;
     end;
   end;
+end;
+
+function TQueryHandler.PopulateMaintenanceData(
+  ACellId: integer): TList<TMaintenanceModel>;
+var
+  LQuery: TADOQuery;
+begin
+  LQuery := TADOQuery.Create(nil);
+  try
+    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_MAINTENANCE ,[IntToStr(ACellId)]));
+    if LQuery <> nil then
+      Result := QueryUtilityHandler.QueryToMaintenanceData(LQuery)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+  finally
+    LQuery.Free;
+  end;
+end;
+
+function TQueryHandler.PopulatePartials(ACellId: integer; ALastMaintenance: Extended): TList<TPartialModel>;
+var
+  LQuery: TADOQuery;
+begin
+  LQuery := TADOQuery.Create(nil);
+  try
+    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_PARTIALS, [intToStr(ACellId), FloatToStr(ALastMaintenance)]));
+    if LQuery <> nil then
+      Result := QueryUtilityHandler.QueryToPartialsList(LQuery)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+  finally
+    LQuery.Free;
+  end;
+
 end;
 
 function TQueryHandler.PopulateProductionOrders(
@@ -119,6 +186,24 @@ begin
   end;
 end;
 
+function TQueryHandler.PopulateTotalPartials(
+  ACellId: integer): TList<TPartialModel>;
+var
+  LQuery: TADOQuery;
+begin
+  LQuery := TADOQuery.Create(nil);
+  try
+    LQuery := QueryExecutor.ExecuteQuery(Format(QUERY_TOTAL_PARTIALS, [intToStr(ACellId)]));
+    if LQuery <> nil then
+      Result := QueryUtilityHandler.QueryToPartialsList(LQuery)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+  finally
+    LQuery.Free;
+  end;
+
+end;
+
 function TQueryHandler.PopulateCell<T>(const AQuery: string;
   AFunc: TFunc<T>): TList<T>;
 var
@@ -133,6 +218,20 @@ begin
       raise Exception.Create(SQL_DATA_NOTFOUND);
   finally
     LQuery.Free;
+  end;
+end;
+
+procedure TQueryHandler.WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
+var
+  LProductionOrder: TProductionOrderModel;
+  LPhase: TPhaseModel;
+begin
+  for LProductionOrder in AProductionOrders do
+  begin
+    for LPhase in LProductionOrder.Phases do
+    begin
+      LProductionOrder.WorkHours := LProductionOrder.WorkHours + LPhase.WorkTime;
+    end;
   end;
 end;
 

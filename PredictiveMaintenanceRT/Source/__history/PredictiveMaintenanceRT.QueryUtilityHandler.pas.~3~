@@ -5,7 +5,7 @@ interface
 uses
   Data.Win.ADODB, System.Generics.Collections,
   PredictiveMaintenanceRT.PartialModel, PredictiveMaintenanceRT.MaintenanceModel,
-  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.ProductionOrderModel;
+  PredictiveMaintenanceRT.PhaseModel;
 
 type TQueryUtilityHandler = class
 
@@ -15,12 +15,10 @@ type TQueryUtilityHandler = class
   public
   {Public declarations}
 
-    function QueryToPartialsList(AQuery : TADOQuery): TList<TPartialModel>;
+    function QueryToList(AQuery : TADOQuery): TList<TPartialModel>;
     function QueryToMaintenanceData(AQuery: TADOQuery): TList<TMaintenanceModel>;
     function QueryToPhaseList(AQuery: TADOQuery): TList<TPhaseModel>;
     function QueryToCellsList(AQuery:TADOQuery): TList<integer>;
-
-    procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
 end;
 
 implementation
@@ -54,7 +52,7 @@ begin
   end;
 end;
 
-function TQueryUtilityHandler.QueryToPartialsList(
+function TQueryUtilityHandler.QueryToList(
   AQuery: TADOQuery): TList<TPartialModel>;
 var
   LPartial: TPartialModel;
@@ -143,18 +141,4 @@ begin
   end;
 end;
 
-procedure TQueryUtilityHandler.WorkHoursSum(
-  AProductionOrders: TList<TProductionOrderModel>);
-var
-  LProductionOrder: TProductionOrderModel;
-  LPhase: TPhaseModel;
-begin
-  for LProductionOrder in AProductionOrders do
-  begin
-    for LPhase in LProductionOrder.Phases do
-    begin
-      LProductionOrder.WorkHours := LProductionOrder.WorkHours + LPhase.WorkTime;
-    end;
-  end;
-end;
 end.
