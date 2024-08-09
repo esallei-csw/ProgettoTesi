@@ -191,7 +191,7 @@ begin
     begin
       LResult := TResultModel.Create;
       LResult.Description := LMaintenanceData.Description;
-      LResult.WarningList.Add(MAN_STRA);
+      LResult.WarningList.Add('Manutenzione straordinaria');
       Result.Add(LResult);
     end
     else

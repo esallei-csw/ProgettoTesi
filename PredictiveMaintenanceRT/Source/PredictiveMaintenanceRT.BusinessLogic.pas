@@ -26,6 +26,7 @@ type
     function GetCellModel(ACellId: integer): TCellDataModel;
   public
     {Public declarations}
+    destructor Destroy; override;
     function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
     procedure UsePastData(AFlag: boolean);
     function GetCellsList: TList<integer>;
@@ -46,6 +47,15 @@ end;
 function TPredictiveMaintenance.GetCellsList: TList<integer>;
 begin
   Result := QueryHandler.GetCellsList;
+end;
+
+destructor TPredictiveMaintenance.Destroy;
+begin
+  if Assigned(FPredictiveAlgorithm) then
+    FPredictiveAlgorithm.Free;
+  if Assigned(FQueryHandler) then
+    FQueryHandler.Free;
+  inherited;
 end;
 
 function TPredictiveMaintenance.GetCellModel(

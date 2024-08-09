@@ -187,14 +187,7 @@ begin
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
-    if LMaintenanceData.LastMaintenance = 0 then
-    begin
-      LResult := TResultModel.Create;
-      LResult.Description := LMaintenanceData.Description;
-      LResult.WarningList.Add(MAN_STRA);
-      Result.Add(LResult);
-    end
-    else
+    if LMaintenanceData.LastMaintenance <> 0 then
     begin
       if GetDaysToMaintenance(LMaintenanceData) <= 0 then
       begin

@@ -100,18 +100,19 @@ var
   LProductionOrder: TProductionOrderModel;
 begin
   Result := TList<TProductionOrderModel>.Create;
-  LProductionOrder := TProductionOrderModel.Create;
   try
-    for LPhase in APhases do
+  LProductionOrder := TProductionOrderModel.Create;
+
+  for LPhase in APhases do
+  begin
+    if LPhase.POID <> LProductionOrder.POID then
     begin
-      if LPhase.POID <> LProductionOrder.POID then
-      begin
-        LProductionOrder := TProductionOrderModel.Create;
-        LProductionOrder.POID := LPhase.POID;
-        Result.Add(LProductionOrder);
-      end;
-      LProductionOrder.Phases.Add(LPhase);
+      LProductionOrder := TProductionOrderModel.Create;
+      LProductionOrder.POID := LPhase.POID;
+      Result.Add(LProductionOrder);
     end;
+    LProductionOrder.Phases.Add(LPhase);
+  end;
   except
     Result.Free;
     raise Exception.Create(PO_ERROR);

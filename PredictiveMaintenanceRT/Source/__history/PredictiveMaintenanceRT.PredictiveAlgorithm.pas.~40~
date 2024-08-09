@@ -12,17 +12,16 @@ type
 
   private
   {Private declarations}
+    FUsePastData: boolean;
     FWorkHoursCalculator: TWorkHoursCalculator;
 
     //Partials utility functions
-    function GetTotalPiecesMade(APartials: TList<TPartialModel>): Double;
-    function GetTotalTimeWorked(APartials: TList<TPartialModel>): Double;
     function GetMedianHoursPerPiece(APartials: TList<TPartialModel>; AIDArtico: integer): Double;
 
     //Calc Date functions
-    function CalcDatePieces(AThreshold: Double; ACell: TCellDataModel): TResultModel;
-    function CalcDateTime(AThreshold: Double; ACell: TCellDataModel): TResultModel;
-    function CalcDateDays(AThreshold: Double; ACell: TCellDataModel): TResultModel;
+    function CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
+    function CalcDateTime(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
+    function CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
 
     //Threshold functions
     function GetDaysToMaintenance(AMaintenanceData: TMaintenanceModel): Double;
@@ -34,8 +33,10 @@ type
 
   public
   {Public declarations}
-  destructor Destroy; override;
+    constructor Create;
+    destructor Destroy; override;
     function CalculateMaintenanceDate(ACell: TCellDataModel): TList<TResultModel>;
+    property UsePastData: boolean read FUsePastData write FUsePastData;
   end;
 
 implementation
@@ -45,30 +46,40 @@ uses
 
 { TPredictiveAlgorithm }
 
-function TPredictiveAlgorithm.CalcDateTime(AThreshold: Double; ACell: TCellDataModel): TResultModel;
+function TPredictiveAlgorithm.CalcDateTime(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
 var
   LPOIter: integer;
   LProductionOrderList: TList<TProductionOrderModel>;
   LWorkHours: Double;
+  LTotPerc: Double;
+  LCountPerc: Double;
 begin
   Result := TResultModel.Create;
   Result.MaintenanceDate := now;
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
+  LTotPerc := ATotalThreshold;
+  LCountPerc := ATotalThreshold - AThreshold;
 
+  Result.WarningList.Add(TIME_CALC);
   LWorkHours := LProductionOrderList[LPOIter].WorkHours;
   while true do
   begin
     AThreshold := AThreshold - WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
     LWorkHours := LWorkHours - WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
+    LCountPerc := LCountPerc + WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
 
     if AThreshold <= 0 then
+    begin
+      Result.Percent := (LCountPerc * 100) / LTotPerc;
       exit;
+    end;
     if LWorkHours <= 0 then
     begin
       if LPOIter = LProductionOrderList.Count - 1 then
       begin
-//        Result.MaintenanceDate := 100000;
+        Result.WarningList.Add(NOT_ENOUGH_PO);
+        Result.Percent := (100 * LCountPerc) / LTotPerc;
         exit;
       end;
       LPOIter := LPOIter + 1;
@@ -82,14 +93,18 @@ begin
   end;
 end;
 
-function TPredictiveAlgorithm.CalcDateDays(AThreshold: Double; ACell: TCellDataModel): TResultModel;
+function TPredictiveAlgorithm.CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
 begin
   Result := TResultModel.Create;
-  Result.MaintenanceDate := now + AThreshold;
+  Result.WarningList.Add(DAYS_CALC);
+  //Increment Months
+  Result.MaintenanceDate := IncMonth(ACell.MaintenanceData[AIndex].LastMaintenance, ACell.MaintenanceData[AIndex].ThresholdMonths);
+  //Increment Days
+  Result.MaintenanceDate := Result.MaintenanceDate + ACell.MaintenanceData[AIndex].ThresholdDays;
   Result.Percent := 100;
 end;
 
-function TPredictiveAlgorithm.CalcDatePieces(AThreshold: Double; ACell: TCellDataModel): TResultModel;
+function TPredictiveAlgorithm.CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
 var
   LPOIter: integer;
   LProductionOrderList: TList<TProductionOrderModel>;
@@ -104,20 +119,32 @@ begin
   Result.MaintenanceDate:= now;
   LPOIter := 0;
   LProductionOrderList := ACell.ProductionOrders;
-  LTotPerc := AThreshold;
-  LCountPerc := 0;
+  LTotPerc := ATotalThreshold;
+  LCountPerc := ATotalThreshold - AThreshold;
+  LPiecesADay := 0;
+  LPiecesAnHour := 0;
 
+  Result.WarningList.Add(PIECES_CALC);
   Lquantity := LProductionOrderList[LPOIter].Phases[0].Quantity;
   while true do
   begin
-    if LProductionOrderList[LPOIter].WorkHours = 0 then
-      LWorkHours := (LProductionOrderList[LPOIter].Pieces * GetMedianHoursPerPiece(ACell.TotalPartials, LProductionOrderList[LPOIter].Phases[0].ArticleID))
-    else
-      LWorkHours := LProductionOrderList[LPOIter].WorkHours;
-    //se workhours è sempre 0 allora gli assegno un valore standard = 100
+    LWorkHours := LProductionOrderList[LPOIter].WorkHours;
+    if (LWorkHours = 0) and (UsePastData) then
+    begin
+      LWorkHours := (LProductionOrderList[LPOIter].Pieces * GetMedianHoursPerPiece(ACell.TotalPartials, LProductionOrderList[LPOIter].Phases[0].ArticleID));
+      Result.WarningList.Add(USED_PAST_DATA + IntToStr(LProductionOrderList[LPOIter].POID));
+      if LWorkHours <> 0 then
+        Result.WarningList.Add(ACTUALLY_USED_PAST_DATA + IntToStr(LProductionOrderList[LPOIter].POID));
+    end;
+
     if LWorkHours = 0 then
-      LWorkHours := 100;
-    LPiecesAnHour := LProductionOrderList[LPOIter].Phases[0].Quantity / LWorkHours;
+    begin
+      LPiecesAnHour := 0;
+      LPOIter := LPOIter + 1;
+    end
+    else
+      LPiecesAnHour := LProductionOrderList[LPOIter].Phases[0].Quantity / LWorkHours;
+
     LPiecesADay := WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) * LPiecesAnHour;
     AThreshold := AThreshold - LPiecesADay;
     LQuantity := LQuantity - LPiecesADay;
@@ -126,14 +153,15 @@ begin
 
     if AThreshold <= 0 then
     begin
-      Result.Percent := LTotPerc / LCountPerc;
+      Result.Percent := (LCountPerc * 100) / LTotPerc;
       exit;
     end;
     if LQuantity <= 0 then
     begin
       if LPOIter = LProductionOrderList.Count - 1 then
       begin
-        Result.Percent := LTotPerc / LCountPerc;
+        Result.WarningList.Add(NOT_ENOUGH_PO);
+        Result.Percent := (LCountPerc * 100) / LTotPerc;
         exit;
       end;
       LPOIter := LPOIter + 1;
@@ -147,33 +175,49 @@ end;
 function TPredictiveAlgorithm.CalculateMaintenanceDate(ACell: TCellDataModel): TList<TResultModel>;
 var
   LMaintenanceData: TMaintenanceModel;
-  LDaysToMaintenance: Double;
   LPiecesToMaintenance: Double;
   LTimeToMaintenance: Double;
   LResultPieces: TResultModel;
   LResultTime: TResultModel;
+  LResult: TResultModel;
+  LIndex: integer;
 begin
+  LIndex := 0;
   Result := TList<TResultModel>.Create;
+  LResult := TResultModel.Create;
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
-    LDaysToMaintenance := GetDaysToMaintenance(LMaintenanceData);
-
-    //calcolo per trovare la data in basa alla soglia Giorni/Mesi
-    if LDaysToMaintenance <= 0 then
+    if LMaintenanceData.LastMaintenance = 0 then
     begin
-      LPiecesToMaintenance := GetPiecesToMaintenance(ACell.Partials, LMaintenanceData);
-      LTimeToMaintenance := GetTimeToMaintenance(ACell.Partials, LMaintenanceData);
-      LResultPieces := CalcDatePieces(LPiecesToMaintenance, ACell);
-      LResultTime := CalcDateTime(LTimeToMaintenance, ACell);
-      if LResultPieces.MaintenanceDate < LResultTime.MaintenanceDate then
-        Result.Add(LResultPieces)
-      else
-        Result.Add(LResultTime);
+      LResult.Description := LMaintenanceData.Description;
+      LResult.WarningList.Add('Manutenzione straordinaria');
+      Result.Add(LResult);
     end
     else
-      Result.Add(CalcDateDays(LDaysToMaintenance, ACell));
+    begin
+      if GetDaysToMaintenance(LMaintenanceData) <= 0 then
+      begin
+        LPiecesToMaintenance := GetPiecesToMaintenance(ACell.TotalPartials, LMaintenanceData);
+        LTimeToMaintenance := GetTimeToMaintenance(ACell.TotalPartials, LMaintenanceData);
+        LResultPieces := CalcDatePieces(LPiecesToMaintenance, LMaintenanceData.ThresholdPieces, ACell);
+        LResultTime := CalcDateTime(LTimeToMaintenance, LMaintenanceData.ThresholdHoursWorked, ACell);
+        if LResultPieces.MaintenanceDate < LResultTime.MaintenanceDate then
+          Result.Add(LResultPieces)
+        else
+          Result.Add(LResultTime);
+      end
+      else
+        Result.Add(CalcDateDays(LIndex, ACell));
+      Result[LIndex].Description := LMaintenanceData.Description;
+    end;
+    LIndex := LIndex + 1;
   end;
+end;
+
+constructor TPredictiveAlgorithm.Create;
+begin
+  FUsePastData := false;
 end;
 
 destructor TPredictiveAlgorithm.Destroy;
@@ -187,9 +231,16 @@ function TPredictiveAlgorithm.GetPiecesToMaintenance(APartials: TList<TPartialMo
   AMaintenanceData: TMaintenanceModel): Double;
 var
   LTotalPiecesMade: Double;
+  I: Integer;
 begin
+
   //calcolo i pezzi totali fatti prendendoli dai parziali di una cella di lavoro
-  LTotalPiecesMade := GetTotalPiecesMade(APartials);
+  for I := 0 to APartials.Count - 1 do
+  begin
+    if APartials[I].StartTime >= AMaintenanceData.LastMaintenance then
+      LTotalPiecesMade := LTotalPiecesMade + APartials[I].Quantity;
+  end;
+
   //calcolo i pezzi che mancano fino alla prossima manutenzione
   Result := AMaintenanceData.ThresholdPieces - LTotalPiecesMade;
 end;
@@ -200,7 +251,7 @@ var
   LTimeFromLastMaintenance: Double;
   LThresholdDays: Double;
 begin
-  //queta funzione deve ritornare la data calcolandola in base alle soglie di tempo(Giorni e mesi)
+  //questa funzione deve ritornare la data calcolandola in base alle soglie di tempo(Giorni e mesi)
   //Calcolare prima di tutto il tempo passato dall ultima manutenzione
   LTimeFromLastMaintenance := now - AMaintenanceData.LastMaintenance;
 
@@ -241,35 +292,18 @@ function TPredictiveAlgorithm.GetTimeToMaintenance(
   APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
 var
   LTotalTimeWorked: Double;
+  I: Integer;
 begin
+
   //calcolo i pezzi totali fatti prendendoli dai parziali di una cella di lavoro
-  LTotalTimeWorked := GetTotalTimeWorked(APartials);
+  for I := 0 to APartials.Count - 1 do
+  begin
+    if APartials[I].StartTime >= AMaintenanceData.LastMaintenance then
+      LTotalTimeWorked := LTotalTimeWorked + APartials[I].Quantity;
+  end;
+
   //calcolo i pezzi che mancano fino alla prossima manutenzione
   Result := AMaintenanceData.ThresholdHoursWorked - LTotalTimeWorked;
-end;
-
-function TPredictiveAlgorithm.GetTotalPiecesMade(
-  APartials: TList<TPartialModel>): Double;
-var
-  I: integer;
-begin
-  Result := 0;
-  for I := 0 to APartials.Count - 1 do
-  begin
-    Result := Result + APartials.Items[I].Quantity;
-  end;
-end;
-
-function TPredictiveAlgorithm.GetTotalTimeWorked(
-  APartials: TList<TPartialModel>): Double;
-var
-  I: integer;
-begin
-  Result := 0;
-  for I := 0 to APartials.Count - 1 do
-  begin
-    Result := Result + APartials.Items[I].WorkHours;
-  end;
 end;
 
 function TPredictiveAlgorithm.GetWorkHoursCalculator: TWorkHoursCalculator;
