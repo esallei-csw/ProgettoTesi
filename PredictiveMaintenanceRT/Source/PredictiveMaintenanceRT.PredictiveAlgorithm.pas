@@ -204,7 +204,7 @@ begin
   LIndex := 0;
   Result := TList<TResultModel>.Create;
 
-
+  AddClosedPeriods(ACell.ClosedPeriods);
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
