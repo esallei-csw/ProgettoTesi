@@ -37,8 +37,7 @@ implementation
 
 { TQueryHandler }
 uses
-  PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages,
-  PredictiveMaintenanceRT.ClosedPeriodModel;
+  PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages;
 
 function TQueryHandler.GetCellsList: TList<integer>;
 var
@@ -86,8 +85,6 @@ begin
     Result.ProductionOrders := PopulateProductionOrders(PopulateCell<TPhaseModel>(Format(QUERY_PHASES ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToPhaseList));
 
     QueryUtilityHandler.WorkHoursSum(Result.ProductionOrders);
-
-    Result.ClosedPeriods := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToClosedPeriods);
   except
     begin
       Result.Free;

@@ -5,8 +5,7 @@ interface
 uses
   Data.Win.ADODB, System.Generics.Collections,
   PredictiveMaintenanceRT.PartialModel, PredictiveMaintenanceRT.MaintenanceModel,
-  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.ProductionOrderModel,
-  PredictiveMaintenanceRT.ClosedPeriodModel;
+  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.ProductionOrderModel;
 
 type TQueryUtilityHandler = class
 
@@ -20,7 +19,6 @@ type TQueryUtilityHandler = class
     function QueryToMaintenanceData(AQuery: TADOQuery): TList<TMaintenanceModel>;
     function QueryToPhaseList(AQuery: TADOQuery): TList<TPhaseModel>;
     function QueryToCellsList(AQuery:TADOQuery): TList<integer>;
-    function QueryToClosedPeriods(AQuery:TADOQuery):TList<TClosedPeriodModel>;
 
     procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
 end;
@@ -76,36 +74,6 @@ begin
       LPartial.Quantity := AQuery.FieldByName(PARTIAL_QUANTITY).AsFloat;
       LPartial.IDArtico := AQuery.FieldByName(PARTIAL_IDARTICO).AsInteger;
       Result.Add(LPartial);
-      AQuery.Next;
-    end;
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
-  end;
-end;
-
-function TQueryUtilityHandler.QueryToClosedPeriods(
-  AQuery: TADOQuery): TList<TClosedPeriodModel>;
-var
-  LPeriod: TClosedPeriodModel;
-begin
-  Result := TList<TClosedPeriodModel>.Create;
-  try
-    if not AQuery.Active then
-      raise Exception.Create(DATASET_CLOSED);
-    AQuery.First;
-    while not AQuery.Eof do
-    begin
-      LPeriod := TClosedPeriodModel.Create;
-      LPeriod.ID := AQuery.FieldByName(CPERIOD_ID).AsInteger;
-      LPeriod.IDCell := AQuery.FieldByName(CPERIOD_IDCELPRO).AsInteger;
-      LPeriod.DataInizio := AQuery.FieldByName(CPERIOD_DATAINI).AsFloat;
-      LPeriod.DataFine := AQuery.FieldByName(CPERIOD_DATAFIN).AsFloat;
-      LPeriod.Tipo := AQuery.FieldByName(CPERIOD_TIPO).AsString;
-      LPeriod.Duration := AQuery.FieldByName(CPERIOD_DURATION).AsInteger;
-      Result.Add(LPeriod);
       AQuery.Next;
     end;
   except

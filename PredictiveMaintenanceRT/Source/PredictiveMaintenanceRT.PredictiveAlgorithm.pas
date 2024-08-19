@@ -5,7 +5,8 @@ interface
 uses
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel,
   PredictiveMaintenanceRT.MaintenanceModel, System.Generics.Collections, PredictiveMaintenanceRT.WorkHoursCalculator,
-  PredictiveMaintenanceRT.ProductionOrderModel, PredictiveMaintenanceRT.ResultModel;
+  PredictiveMaintenanceRT.ProductionOrderModel, PredictiveMaintenanceRT.ResultModel,
+  PredictiveMaintenanceRT.ClosedPeriodModel;
 
 type
   TPredictiveAlgorithm = class
@@ -15,8 +16,9 @@ type
     FUsePastData: boolean;
     FWorkHoursCalculator: TWorkHoursCalculator;
 
-    //Partials utility functions
+    //Utility functions
     function GetMedianHoursPerPiece(APartials: TList<TPartialModel>; AIDArtico: integer): Double;
+    procedure AddClosedPeriods(APeriods: TList<TClosedPeriodModel>);
 
     //Calc Date functions
     function CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
@@ -90,6 +92,23 @@ begin
       raise Exception.Create(FINISHED_PO);
 
     Result.MaintenanceDate := Result.MaintenanceDate + 1;
+  end;
+end;
+
+procedure TPredictiveAlgorithm.AddClosedPeriods(
+  APeriods: TList<TClosedPeriodModel>);
+var
+  LPeriod: TClosedPeriodModel;
+  I: Double;
+begin
+  for LPeriod in APeriods do
+  begin
+    I := LPeriod.DataInizio;
+    while I <> LPeriod.DataFine do
+    begin
+      WorkHoursCalculator.AddHoliday(I);
+      I := I + 1;
+    end;
   end;
 end;
 
@@ -185,8 +204,11 @@ begin
   LIndex := 0;
   Result := TList<TResultModel>.Create;
 
+
+
   for LMaintenanceData in ACell.MaintenanceData do
   begin
+    //if manutenzione straordinaria then skip calcolo
     if LMaintenanceData.LastMaintenance = 0 then
     begin
       LResult := TResultModel.Create;
