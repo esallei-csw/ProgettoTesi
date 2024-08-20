@@ -92,11 +92,15 @@ begin
 
     Result.MaintenanceData := PopulateCell<TMaintenanceModel>(Format(QUERY_MAINTENANCE ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToMaintenanceData);
 
+    //Result.Partials := PopulateCell<TPartialModel>(Format(QUERY_PARTIALS, [intToStr(ACellId), FloatToStr(Result.MaintenanceData[0].LastMaintenance)]), QueryUtilityHandler.QueryToPartialsList);
+
     Result.TotalPartials := PopulateCell<TPartialModel>(Format(QUERY_TOTAL_PARTIALS, [intToStr(ACellId)]), QueryUtilityHandler.QueryToPartialsList);
 
     Result.ProductionOrders := PopulateProductionOrders(PopulateCell<TPhaseModel>(Format(QUERY_PHASES ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToPhaseList));
 
     QueryUtilityHandler.WorkHoursSum(Result.ProductionOrders);
+
+    Result.ClosedPeriods := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToClosedPeriods);
 
     Result.MachineStops := PopulateCell<TMachineStopModel>(Format(QUERY_MACHINESTOPS, [IntToStr(ACellId)]), QueryUtilityHandler.QueryToMachineStops);
 

@@ -77,7 +77,7 @@ begin
     AQuery.First;
     while not AQuery.Eof do
     begin
-      LCellId := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LCellId := AQuery.FieldByName('IDCELPRO').AsInteger;
       Result.Add(LCellId);
       AQuery.Next;
     end;
@@ -133,7 +133,7 @@ begin
     begin
       LPeriod := TClosedPeriodModel.Create;
       LPeriod.ID := AQuery.FieldByName(CPERIOD_ID).AsInteger;
-      LPeriod.IDCell := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LPeriod.IDCell := AQuery.FieldByName(CPERIOD_IDCELPRO).AsInteger;
       LPeriod.DataInizio := AQuery.FieldByName(CPERIOD_DATAINI).AsFloat;
       LPeriod.DataFine := AQuery.FieldByName(CPERIOD_DATAFIN).AsFloat;
       LPeriod.Tipo := AQuery.FieldByName(CPERIOD_TIPO).AsString;

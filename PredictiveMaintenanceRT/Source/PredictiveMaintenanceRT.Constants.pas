@@ -71,10 +71,10 @@ const
   QUERY_CELLS = 'select distinct IDCELPRO from MANUTENZIONI where IDCELPRO is not null';
   QUERY_CLOSEDPERIOD = 'select ID, IDCELPRO, DATINI, DATFIN, TIPO, DURATA from TAPCCF where (IDCELPRO = %s) or (TIPO = ''SA'') or (TIPO = ''SR'')';
   QUERY_MACHINESTOPS = 'select ID, IDCELPRO, DATIN, ORAIN*24 as OraInizio, DATFI, ORAFI*24 as OraFine, DUR*24 as DurataInOre from ALLARMI where IDCELPRO = %s and APERTO = 0';
-  QUERY_CALENDAR = 'select PROFDET.ID, PROFASS.IDPROFTES, GIORNO, TOTORE*24 as TotInOre, IDCELPRO, GGINIZIO' +
-                    'from PROFDET'+
-                    'join PROFASS on PROFASS.IDPROFTES = PROFDET.IDPROFTES'+
-                    'join PROFTES on PROFTES.ID = PROFDET.IDPROFTES'+
+  QUERY_CALENDAR = 'select PROFDET.ID, PROFASS.IDPROFTES, GIORNO, TOTORE*24 as TotInOre, IDCELPRO, GGINIZIO ' +
+                    'from PROFDET '+
+                    'join PROFASS on PROFASS.IDPROFTES = PROFDET.IDPROFTES '+
+                    'join PROFTES on PROFTES.ID = PROFDET.IDPROFTES '+
                     'where (GGINIZIO = (select max(GGINIZIO) from PROFASS where IDCELPRO = %s and VARIANTE =''0000''))';
 
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +

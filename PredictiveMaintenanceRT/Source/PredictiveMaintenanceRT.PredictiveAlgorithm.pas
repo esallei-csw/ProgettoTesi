@@ -19,7 +19,6 @@ type
 
     //Utility functions
     function GetMedianHoursPerPiece(APartials: TList<TPartialModel>; AIDArtico: integer): Double;
-    procedure AddClosedPeriods(APeriods: TList<TClosedPeriodModel>);
     function GetMedianDailyMachineStops(AMachineStops: TList<TMachineStopModel>): Double;
 
     //Calc Date functions
@@ -96,23 +95,6 @@ begin
       raise Exception.Create(FINISHED_PO);
 
     Result.MaintenanceDate := Result.MaintenanceDate + 1;
-  end;
-end;
-
-procedure TPredictiveAlgorithm.AddClosedPeriods(
-  APeriods: TList<TClosedPeriodModel>);
-var
-  LPeriod: TClosedPeriodModel;
-  I: Double;
-begin
-  for LPeriod in APeriods do
-  begin
-    I := LPeriod.DataInizio;
-    while I <> LPeriod.DataFine do
-    begin
-      WorkHoursCalculator.AddHoliday(I);
-      I := I + 1;
-    end;
   end;
 end;
 
@@ -208,7 +190,6 @@ begin
   LIndex := 0;
   Result := TList<TResultModel>.Create;
   FIDCell := ACell.CellId;
-  //AddClosedPeriods(ACell.ClosedPeriods);
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
