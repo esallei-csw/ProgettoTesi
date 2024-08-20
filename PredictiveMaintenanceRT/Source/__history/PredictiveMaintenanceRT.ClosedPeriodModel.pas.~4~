@@ -32,12 +32,12 @@ implementation
 
 constructor TClosedPeriodModel.Create;
 begin
-  FID := varEmpty;
-  FIDCell := varEmpty;
-  FDataInizio := varEmpty;
-  FDataFine := varEmpty;
+  FID := 0;
+  FIDCell := 0;
+  FDataInizio := 0;
+  FDataFine := 0;
   FTipo := '';
-  FDuration := varEmpty;
+  FDuration := 0;
 end;
 
 end.

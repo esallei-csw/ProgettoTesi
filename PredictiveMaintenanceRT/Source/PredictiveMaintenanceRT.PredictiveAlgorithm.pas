@@ -6,19 +6,21 @@ uses
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel,
   PredictiveMaintenanceRT.MaintenanceModel, System.Generics.Collections, PredictiveMaintenanceRT.WorkHoursCalculator,
   PredictiveMaintenanceRT.ProductionOrderModel, PredictiveMaintenanceRT.ResultModel,
-  PredictiveMaintenanceRT.ClosedPeriodModel;
+  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.MachineStopModel;
 
 type
   TPredictiveAlgorithm = class
 
   private
   {Private declarations}
+    FIDCell: integer;
     FUsePastData: boolean;
     FWorkHoursCalculator: TWorkHoursCalculator;
 
     //Utility functions
     function GetMedianHoursPerPiece(APartials: TList<TPartialModel>; AIDArtico: integer): Double;
     procedure AddClosedPeriods(APeriods: TList<TClosedPeriodModel>);
+    function GetMedianDailyMachineStops(AMachineStops: TList<TMachineStopModel>): Double;
 
     //Calc Date functions
     function CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
@@ -55,10 +57,12 @@ var
   LWorkHours: Double;
   LTotPerc: Double;
   LCountPerc: Double;
+  LDailyMachineStops: Double;
 begin
   Result := TResultModel.Create;
   Result.MaintenanceDate := now;
   LPOIter := 0;
+  LDailyMachineStops := GetMedianDailyMachineStops(ACell.MachineStops);
   LProductionOrderList := ACell.ProductionOrders;
   LTotPerc := ATotalThreshold;
   LCountPerc := ATotalThreshold - AThreshold;
@@ -67,9 +71,9 @@ begin
   LWorkHours := LProductionOrderList[LPOIter].WorkHours;
   while true do
   begin
-    AThreshold := AThreshold - WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
-    LWorkHours := LWorkHours - WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
-    LCountPerc := LCountPerc + WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
+    AThreshold := AThreshold - (WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) - LDailyMachineStops);
+    LWorkHours := LWorkHours - (WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) - LDailyMachineStops);
+    LCountPerc := LCountPerc + (WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) - LDailyMachineStops);
 
     if AThreshold <= 0 then
     begin
@@ -203,8 +207,8 @@ var
 begin
   LIndex := 0;
   Result := TList<TResultModel>.Create;
-
-  AddClosedPeriods(ACell.ClosedPeriods);
+  FIDCell := ACell.CellId;
+  //AddClosedPeriods(ACell.ClosedPeriods);
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
@@ -255,7 +259,7 @@ var
   LTotalPiecesMade: Double;
   I: Integer;
 begin
-
+  LTotalPiecesMade := 0;
   //calcolo i pezzi totali fatti prendendoli dai parziali di una cella di lavoro
   for I := 0 to APartials.Count - 1 do
   begin
@@ -310,13 +314,31 @@ begin
     Result := Result / LCount;
 end;
 
+function TPredictiveAlgorithm.GetMedianDailyMachineStops(
+  AMachineStops: TList<TMachineStopModel>): Double;
+var
+  LMachineStop: TMachineStopModel;
+  LDays: Double;
+  LStopsVal: Double;
+begin
+  if AMachineStops.count = 0 then
+    Exit(0);
+  for LMachineStop in AMachineStops do
+  begin
+    LDays := (LMachineStop.DataFine - LMachineStop.DataInizio) + 1;
+    LStopsVal := LStopsVal + (LMachineStop.Durata / LDays);
+  end;
+
+  Result := LStopsVal / AMachineStops.Count;
+end;
+
 function TPredictiveAlgorithm.GetTimeToMaintenance(
   APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
 var
   LTotalTimeWorked: Double;
   I: Integer;
 begin
-
+  LTotalTimeWorked := 0;
   //calcolo i pezzi totali fatti prendendoli dai parziali di una cella di lavoro
   for I := 0 to APartials.Count - 1 do
   begin
@@ -331,7 +353,7 @@ end;
 function TPredictiveAlgorithm.GetWorkHoursCalculator: TWorkHoursCalculator;
 begin
   if not Assigned(FWorkHoursCalculator) then
-    FWorkHoursCalculator := TWorkHoursCalculator.Create;
+    FWorkHoursCalculator := TWorkHoursCalculator.Create(FIDCell);
   Result := FWorkHoursCalculator;
 end;
 

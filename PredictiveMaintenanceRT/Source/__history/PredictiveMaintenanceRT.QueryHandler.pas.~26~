@@ -6,7 +6,7 @@ uses
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel, Data.Win.ADODB, System.Generics.Collections,
   PredictiveMaintenanceRT.QueryExecutor, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel,
   PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.QueryUtilityHandler,
-  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.CalendarModel;
+  PredictiveMaintenanceRT.ClosedPeriodModel;
 
 type
   TQueryHandler = class
@@ -33,7 +33,6 @@ type
     function PopulateCellModel(ACellId: integer): TCellDataModel;
     function GetCellsList: TList<integer>;
     function GetClosedPeriods(ACellId: integer): TList<TClosedPeriodModel>;
-    function GetCalendarData(ACellId: integer): TList<TCalendarModel>;
   end;
 
 implementation
@@ -41,11 +40,6 @@ implementation
 { TQueryHandler }
 uses
   PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.MachineStopModel;
-
-function TQueryHandler.GetCalendarData(ACellId: integer): TList<TCalendarModel>;
-begin
-  Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToCalendar);
-end;
 
 function TQueryHandler.GetCellsList: TList<integer>;
 var
@@ -67,7 +61,7 @@ end;
 function TQueryHandler.GetClosedPeriods(
   ACellId: integer): TList<TClosedPeriodModel>;
 begin
-  Result := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToClosedPeriods);
+
 end;
 
 function TQueryHandler.GetQueryExecutor: TQueryExecutor;

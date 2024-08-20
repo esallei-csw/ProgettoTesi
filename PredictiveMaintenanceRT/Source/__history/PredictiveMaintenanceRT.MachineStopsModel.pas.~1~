@@ -1,0 +1,7 @@
+unit PredictiveMaintenanceRT.MachineStopsModel;
+
+interface
+
+implementation
+
+end.

@@ -16,7 +16,7 @@ type
     //FPartials: TList<TPartialModel>;
     FProductionOrders: TList<TProductionOrderModel>;
     FTotalPartials: TList<TPartialModel>;
-    FClosedPeriods: TList<TClosedPeriodModel>;
+    //FClosedPeriods: TList<TClosedPeriodModel>;
     FMachineStops: TList<TMachineStopModel>;
 
 
@@ -29,7 +29,7 @@ type
     //property Partials: TList<TPartialModel> read FPartials write FPartials;
     property ProductionOrders: TList<TProductionOrderModel> read FProductionOrders write FProductionOrders;
     property TotalPartials: TList<TPartialModel> read FTotalPartials write FTotalPartials;
-    property ClosedPeriods: TList<TClosedPeriodModel> read FClosedPeriods write FClosedPeriods;
+    //property ClosedPeriods: TList<TClosedPeriodModel> read FClosedPeriods write FClosedPeriods;
     property MachineStops: TList<TMachineStopModel> read FMachineStops write FMachineStops;
 
 
@@ -46,7 +46,7 @@ begin
   //FPartials := TList<TPartialModel>.Create;
   FProductionOrders := TList<TProductionOrderModel>.Create;
   FTotalPartials := TList<TPartialModel>.Create;
-  FClosedPeriods := TList<TClosedPeriodModel>.Create;
+  //FClosedPeriods := TList<TClosedPeriodModel>.Create;
   FMachineStops := TList<TMachineStopModel>.Create;
 end;
 
@@ -56,7 +56,7 @@ begin
   //FPartials.Free;
   FProductionOrders.Free;
   FTotalPartials.Free;
-  FClosedPeriods.Free;
+  //FClosedPeriods.Free;
   FMachineStops.Free;
   inherited;
 end;

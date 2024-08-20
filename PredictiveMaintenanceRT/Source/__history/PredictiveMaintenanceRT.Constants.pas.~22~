@@ -52,13 +52,6 @@ const
   STOPS_ORAFIN = 'OraFine';
   STOPS_DURATA = 'DurataInOre';
 
-  ID = 'ID';
-  CALENDAR_ID = 'IDPROFTES';
-  IDCELPRO = 'IDCELPRO';
-  CALENDAR_DAY = 'GIORNO';
-  CALENDAR_TOTORE = 'TotInOre';
-  CALENDAR_STARTDAY = 'GGINIZIO';
-
   QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut, IDARTICO from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
   QUERY_MAINTENANCE = 'select IDCELPRO, VARDB.DESCR as Descrizione, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI left join VARDB on MANUTENZIONI.IDARTICO = VARDB.IDARTICO where IDCELPRO = %s';
   QUERY_PHASES = 'SELECT OPTES.ID as IDOrdineProduzione, OPTES.STATO, OPSDLFAS.ID as IDFase, LAVORAZIONI.IDCELPRO as IDCella, OPTES.IDARTICO as IDArticolo, OPTES.QTAOP, OPSDLFAS.TEMESE*24 as TempoLavoroInOreTeorico, OPTES.DATRIC as DataRichiesta '+

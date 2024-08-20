@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.DateUtils, System.Generics.Collections, PredictiveMaintenanceRT.QueryHandler,
-  PredictiveMaintenanceRT.ClosedPeriodModel;
+  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.CalendarModel;
 
 
 type
@@ -14,8 +14,8 @@ type
     FHolidayList: TList<Double>;
     FQueryHandler: TQueryHandler;
     FClosedPeriods: TList<TClosedPeriodModel>;
+    FCalendar: TList<TCalendarModel>;
     function IsHoliday(const ADate: Double): Boolean;
-    procedure GetData;
 
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read GetQueryHandler write FQueryHandler;
@@ -31,9 +31,13 @@ implementation
 
 
 constructor TWorkHoursCalculator.Create(ACellId: integer);
+var
+  I: Integer;
 begin
   FIDCell := ACellId;
   FHolidayList := TList<Double>.Create;
+  FClosedPeriods := QueryHandler.GetClosedPeriods(FIDCell);
+  FCalendar := QueryHandler.GetCalendarData(FIDCell);
 end;
 destructor TWorkHoursCalculator.Destroy;
 begin
@@ -48,9 +52,6 @@ function TWorkHoursCalculator.IsHoliday(const ADate: Double): Boolean;
 begin
   Result := FHolidayList.Contains(ADate);
 end;
-procedure TWorkHoursCalculator.GetData;
-begin
-end;
 
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;
 begin
@@ -61,17 +62,20 @@ end;
 
 function TWorkHoursCalculator.GetWorkHours(ADate: Double): Double;
 var
-  DayOfWeek: Integer;
+  LDayOfWeek: Integer;
+  LDay: TCalendarModel;
 begin
   if IsHoliday(ADate) then
     Exit(0);
 
   // Determine the day of the week
-  DayOfWeek := DayOfTheWeek(ADate);
-  // Check if it's a weekend
-  if (DayOfWeek = DaySaturday) or (DayOfWeek = DaySunday) then
-    Exit(0);
-  // Otherwise, it's a standard workday
-  Result := 8;
+  LDayOfWeek := DayOfTheWeek(ADate);
+
+  for LDay in FCalendar do
+  begin
+    if LDayOfWeek = LDay.Day then
+      Exit(LDay.TotOre);
+  end;
+  Result := 0;
 end;
 end.
