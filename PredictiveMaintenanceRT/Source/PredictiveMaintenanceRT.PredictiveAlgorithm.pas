@@ -56,12 +56,11 @@ var
   LWorkHours: Double;
   LTotPerc: Double;
   LCountPerc: Double;
-  LDailyMachineStops: Double;
+  LRealWorkHours: Double;
 begin
   Result := TResultModel.Create;
   Result.MaintenanceDate := now;
   LPOIter := 0;
-  LDailyMachineStops := GetMedianDailyMachineStops(ACell.MachineStops);
   LProductionOrderList := ACell.ProductionOrders;
   LTotPerc := ATotalThreshold;
   LCountPerc := ATotalThreshold - AThreshold;
@@ -70,12 +69,19 @@ begin
   LWorkHours := LProductionOrderList[LPOIter].WorkHours;
   while true do
   begin
-    AThreshold := AThreshold - (WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) - LDailyMachineStops);
-    LWorkHours := LWorkHours - (WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) - LDailyMachineStops);
-    LCountPerc := LCountPerc + (WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) - LDailyMachineStops);
+    //Daily Work Hours Calc
+    LRealWorkHours := WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
+    if LRealWorkHours > 0 then
+      LRealWorkHours := LRealWorkHours - GetMedianDailyMachineStops(ACell.MachineStops);
+    AThreshold := AThreshold - LRealWorkHours;
+    LWorkHours := LWorkHours - LRealWorkHours;
+    LCountPerc := LCountPerc + LRealWorkHours;
 
+    //Threshold Check
     if AThreshold <= 0 then
     begin
+      if LTotPerc <= 0 then
+        exit;
       Result.Percent := (LCountPerc * 100) / LTotPerc;
       exit;
     end;
@@ -119,6 +125,7 @@ var
   LWorkHours: Double;
   LTotPerc: Double;
   LCountPerc: Double;
+  LRealWorkHours: Double;
 begin
   Result := TResultModel.Create;
   Result.MaintenanceDate:= now;
@@ -134,12 +141,12 @@ begin
   while true do
   begin
     LWorkHours := LProductionOrderList[LPOIter].WorkHours;
+    //Past Data Calc
     if (LWorkHours = 0) and (UsePastData) then
     begin
       LWorkHours := (LProductionOrderList[LPOIter].Pieces * GetMedianHoursPerPiece(ACell.TotalPartials, LProductionOrderList[LPOIter].Phases[0].ArticleID));
-      Result.WarningList.Add(USED_PAST_DATA + IntToStr(LProductionOrderList[LPOIter].POID));
       if LWorkHours <> 0 then
-        Result.WarningList.Add(ACTUALLY_USED_PAST_DATA + IntToStr(LProductionOrderList[LPOIter].POID));
+        Result.WarningList.Add(USED_PAST_DATA + IntToStr(LProductionOrderList[LPOIter].POID));
     end;
 
     if LWorkHours = 0 then
@@ -149,15 +156,20 @@ begin
     end
     else
       LPiecesAnHour := LProductionOrderList[LPOIter].Phases[0].Quantity / LWorkHours;
+    //Daily Work Hours Calc
+    LRealWorkHours := WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
+    if LRealWorkHours > 0 then
+      LRealWorkHours := LRealWorkHours - GetMedianDailyMachineStops(ACell.MachineStops);
 
-    LPiecesADay := WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate) * LPiecesAnHour;
+    LPiecesADay := LRealWorkHours * LPiecesAnHour;
     AThreshold := AThreshold - LPiecesADay;
     LQuantity := LQuantity - LPiecesADay;
     LCountPerc := LCountPerc + LPiecesADay;
-
-
+    //Threshold Check
     if AThreshold <= 0 then
     begin
+      if LTotPerc <= 0 then
+        exit;
       Result.Percent := (LCountPerc * 100) / LTotPerc;
       exit;
     end;
@@ -187,13 +199,14 @@ var
   LResult: TResultModel;
   LIndex: integer;
 begin
+  if ACell = nil then
+    raise Exception.Create(CELL_DATA_NIL);
   LIndex := 0;
   Result := TList<TResultModel>.Create;
   FIDCell := ACell.CellId;
 
   for LMaintenanceData in ACell.MaintenanceData do
   begin
-    //if manutenzione straordinaria then skip calcolo
     if LMaintenanceData.LastMaintenance = 0 then
     begin
       LResult := TResultModel.Create;
@@ -301,16 +314,20 @@ var
   LMachineStop: TMachineStopModel;
   LDays: Double;
   LStopsVal: Double;
+  LDaysCount: Double;
 begin
+  LStopsVal := 0;
+  LDaysCount := 0;
   if AMachineStops.count = 0 then
     Exit(0);
   for LMachineStop in AMachineStops do
   begin
     LDays := (LMachineStop.DataFine - LMachineStop.DataInizio) + 1;
+    LDaysCount := LDaysCount + LDays;
     LStopsVal := LStopsVal + (LMachineStop.Durata / LDays);
   end;
 
-  Result := LStopsVal / AMachineStops.Count;
+  Result := LStopsVal / LDaysCount;
 end;
 
 function TPredictiveAlgorithm.GetTimeToMaintenance(

@@ -77,7 +77,6 @@ begin
 
   //get only calendar
   //get week from calendar x
-  //modificare i model e le query
 
   LDay := TCalendarDayModel.Create;
   FDayCalendar := QueryHandler.GetCalendarData(FIDCell);

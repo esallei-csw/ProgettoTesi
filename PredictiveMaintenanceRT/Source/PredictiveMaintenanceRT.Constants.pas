@@ -8,7 +8,7 @@ const
   SERVER_NAME = 'CSW325';
   DEFAULT_USERNAME = 'sa';
   DEFAULT_PASSWORD = '1Password1';
-  DEFAULT_CELLID = 13;
+  DEFAULT_CELLID = 2;
 
 
   WORK_HOURS_IN_A_DAY = 8;
@@ -60,7 +60,9 @@ const
   CALENDAR_STARTDAY = 'GGINIZIO';
 
   QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut, IDARTICO from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
-  QUERY_MAINTENANCE = 'select IDCELPRO, VARDB.DESCR as Descrizione, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI left join VARDB on MANUTENZIONI.IDARTICO = VARDB.IDARTICO where IDCELPRO = %s';
+
+  QUERY_MAINTENANCE = 'select IDCELPRO, VARDB.DESCR as Descrizione, TEMPO*24 as TempoInOre, QTA, GIORNI, MESI, ULTMAN from MANUTENZIONI left join VARDB on MANUTENZIONI.IDVARDB = VARDB.ID where (MANUTENZIONI.OBSOLETA=0) and (IDCELPRO = %s) and (MANUTENZIONI.IsStra = 0) ';
+
   QUERY_PHASES = 'SELECT OPTES.ID as IDOrdineProduzione, OPTES.STATO, OPSDLFAS.ID as IDFase, LAVORAZIONI.IDCELPRO as IDCella, OPTES.IDARTICO as IDArticolo, OPTES.QTAOP, OPSDLFAS.TEMESE*24 as TempoLavoroInOreTeorico, OPTES.DATRIC as DataRichiesta '+
                 'from OPTES '+
                 'left join OPSDLFAS on OPTES.ID = OPSDLFAS.IDOPTES '+
@@ -75,7 +77,7 @@ const
                     'from PROFDET '+
                     'join PROFASS on PROFASS.IDPROFTES = PROFDET.IDPROFTES '+
                     'join PROFTES on PROFTES.ID = PROFDET.IDPROFTES '+
-                    'where (GGINIZIO = (select max(GGINIZIO) from PROFASS where IDCELPRO = %s and VARIANTE =''0000''))';
+                    'where IDCELPRO = %s and VARIANTE =''0000''';
 
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +
                       'Persist Security Info=False;' +

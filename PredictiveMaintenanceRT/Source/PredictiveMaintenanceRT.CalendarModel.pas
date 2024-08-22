@@ -2,28 +2,27 @@ unit PredictiveMaintenanceRT.CalendarModel;
 
 interface
 
+uses
+  System.Generics.Collections;
+
 type
-TCalendarModel = class
+  TCalendarModel = class
 
   private
   {Private declarations}
-    FID: integer;
-    FIDCalendar: integer;
-    FIDCell: integer;
-    FDay: integer;
-    FTotOre: Double;
-    FStartDay: Double;
+  FIDCelPro: integer;
+  FIDCalendar: integer;
+  FDayOfWeek: TList<Double>;
+  FStartDay: Double;
 
 
   public
   {Public declarations}
   constructor Create;
 
-  property ID: integer read FID write FID;
+  property IDCelPro: integer read FIDCelPro write FIDCelPro;
   property IDCalendar: integer read FIDCalendar write FIDCalendar;
-  property IDCell: integer read FIDCell write FIDCell;
-  property Day: integer read FDay write FDay;
-  property TotOre: Double read FTotOre write FTotOre;
+  property DayOfWeek: TList<Double> read FDayOfWeek write FDayOfWeek;
   property StartDay: Double read FStartDay write FStartDay;
 
 end;
@@ -33,13 +32,18 @@ implementation
 { TCalendarModel }
 
 constructor TCalendarModel.Create;
+var
+  I: integer;
 begin
-  FID := varEmpty;
+  FIDCelPro := varEmpty;
   FIDCalendar := varEmpty;
-  FIDCell := varEmpty;
-  FDay := varEmpty;
-  FTotOre := varEmpty;
+  FDayOfWeek := TList<Double>.Create;
   FStartDay := varEmpty;
+  //inizializzo la lista dei giorni della settimana
+  for I := 0 to 7 do
+  begin
+    FDayOfWeek.Add(0);
+  end;
 end;
 
 end.

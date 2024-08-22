@@ -17,10 +17,10 @@ type
     FClosedPeriods: TList<TClosedPeriodModel>;
     FDayCalendar: TList<TCalendarDayModel>;
     FCalendar: TList<TCalendarModel>;
+//    FDaysOfWeek: TList<Double>;
     function IsHoliday(const ADate: Double): Boolean;
     procedure AddClosedPeriods;
     procedure InitializeCalendar;
-    function GetCalendarWeek(ADate: Double): TList<Double>;
 
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read GetQueryHandler write FQueryHandler;
@@ -72,43 +72,28 @@ end;
 procedure TWorkHoursCalculator.InitializeCalendar;
 var
   LDay: TCalendarDayModel;
-  LCalendar: TCalendarModel;
+  I: integer;
 begin
-
-  //get only calendar
-  //get week from calendar x
-  //modificare i model e le query
-
   LDay := TCalendarDayModel.Create;
   FDayCalendar := QueryHandler.GetCalendarData(FIDCell);
+
+  I := 0;
   FCalendar := TList<TCalendarModel>.Create;
-  LCalendar := TCalendarModel.Create;
+  FCalendar.Add(nil);
   for LDay in FDayCalendar do
   begin
-    if LCalendar.IDCalendar = 0 then
+    if FCalendar[I].IDCalendar <> LDay.IDCalendar then
     begin
-      LCalendar.IDCelPro := LDay.IDCell;
-      LCalendar.IDCalendar := LDay.IDCalendar;
-      LCalendar.StartDay := LDay.StartDay;
-      LCalendar.DayOfWeek[LDay.Day] := LDay.TotOre;
+      I := I + 1;
+      FCalendar[I].IDCelPro := LDay.IDCell;
+      FCalendar[I].IDCalendar := LDay.IDCalendar;
+      FCalendar[I].DayOfWeek[LDay.Day] := LDay.TotOre;
+      FCalendar[I].StartDay := LDay.StartDay;
     end
     else
-      begin
-      if LCalendar.IDCalendar <> LDay.IDCalendar then
-      begin
-        FCalendar.Add(LCalendar);
-        LCalendar := TCalendarModel.Create;
-        LCalendar.IDCelPro := LDay.IDCell;
-        LCalendar.IDCalendar := LDay.IDCalendar;
-        LCalendar.StartDay := LDay.StartDay;
-        LCalendar.DayOfWeek[LDay.Day] := LDay.TotOre;
-      end
-      else
-      begin
-        LCalendar.DayOfWeek[LDay.Day] := LDay.TotOre;
-      end;
+    begin
+      FCalendar[I].DayOfWeek[LDay.Day] := LDay.TotOre;
     end;
-
 
   end;
 
@@ -119,21 +104,6 @@ begin
   Result := FHolidayList.Contains(ADate);
 end;
 
-function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): TList<Double>;
-var
-  LDateTmp: Double;
-  LCalendar: TCalendarModel;
-begin
-  for LCalendar in FCalendar do
-  begin
-    if (LCalendar.StartDay < ADate) and (LCalendar.StartDay > LDateTmp) then
-    begin
-      LDateTmp := LCalendar.StartDay;
-      Result := LCalendar.DayOfWeek;
-    end;
-  end;
-end;
-
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;
 begin
   if not Assigned(FQueryHandler) then
@@ -142,10 +112,15 @@ begin
 end;
 
 function TWorkHoursCalculator.GetWorkHours(ADate: Double): Double;
+var
+  LDayOfWeek: Integer;
 begin
   if IsHoliday(ADate) then
     Exit(0);
 
-  Result := GetCalendarWeek(ADate)[DayOfTheWeek(ADate)];
+  // Determine the day of the week
+  LDayOfWeek := DayOfTheWeek(ADate);
+
+//  Result := FDaysOfWeek[LDayOfWeek];
 end;
 end.
