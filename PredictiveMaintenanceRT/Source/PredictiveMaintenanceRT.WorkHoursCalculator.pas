@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.DateUtils, System.Generics.Collections, PredictiveMaintenanceRT.QueryHandler,
-  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.CalendarDayModel,
+  PredictiveMaintenanceRT.ClosedPeriodModel,
   PredictiveMaintenanceRT.CalendarModel;
 
 
@@ -79,10 +79,22 @@ begin
 end;
 
 function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): TList<Double>;
+var
+  LCalendar: TCalendarModel;
+  LDateTmp: Double;
+  LResultID: integer;
 begin
-  //check fcalendare and find correct calendar
-
-  //get calendar week of that calendar
+  //select correct calendar for ADate
+  for LCalendar in FCalendar do
+  begin
+    if (LCalendar.StartDay < ADate) and (LCalendar.StartDay > LDateTmp) then
+    begin
+      LDateTmp := LCalendar.StartDay;
+      LResultID := LCalendar.IDCalendar;
+    end;
+  end;
+  //get calendar week of correct calendar
+  Result := QueryHandler.GetWeekCalendar(LResultID);
 end;
 
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;
@@ -97,6 +109,6 @@ begin
   if IsHoliday(ADate) then
     Exit(0);
 
-//  Result := GetCalendarWeek(ADate)[DayOfTheWeek(ADate)];
+  Result := GetCalendarWeek(ADate)[DayOfTheWeek(ADate)];
 end;
 end.

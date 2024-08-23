@@ -12,7 +12,6 @@ type
   {Private declarations}
   FIDCelPro: integer;
   FIDCalendar: integer;
-//  FDayOfWeek: TList<Double>;
   FStartDay: Double;
 
 
@@ -22,7 +21,6 @@ type
 
   property IDCelPro: integer read FIDCelPro write FIDCelPro;
   property IDCalendar: integer read FIDCalendar write FIDCalendar;
-//  property DayOfWeek: TList<Double> read FDayOfWeek write FDayOfWeek;
   property StartDay: Double read FStartDay write FStartDay;
 
 end;
@@ -37,13 +35,7 @@ var
 begin
   FIDCelPro := varEmpty;
   FIDCalendar := varEmpty;
-//  FDayOfWeek := TList<Double>.Create;
   FStartDay := varEmpty;
-  //inizializzo la lista dei giorni della settimana
-//  for I := 0 to 7 do
-//  begin
-//    FDayOfWeek.Add(0);
-//  end;
 end;
 
 end.

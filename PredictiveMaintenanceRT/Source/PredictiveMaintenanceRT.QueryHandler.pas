@@ -34,6 +34,7 @@ type
     function GetCellsList: TList<integer>;
     function GetClosedPeriods(ACellId: integer): TList<TClosedPeriodModel>;
     function GetCalendarData(ACellId: integer): TList<TCalendarModel>;
+    function GetWeekCalendar(ACalendarId: integer): TList<Double>;
   end;
 
 implementation
@@ -82,6 +83,11 @@ begin
   if not Assigned(FQueryUtilityHandler) then
     FQueryUtilityHandler := TQueryUtilityHandler.Create;
   Result := FQueryUtilityHandler;
+end;
+
+function TQueryHandler.GetWeekCalendar(ACalendarId: integer): TList<Double>;
+begin
+  Result := PopulateCell<Double>(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]), QueryUtilityHandler.QueryToWeekCalendar);
 end;
 
 function TQueryHandler.PopulateCellModel(ACellId: integer): TCellDataModel;

@@ -24,7 +24,6 @@ type TQueryUtilityHandler = class
     function QueryToClosedPeriods(AQuery:TADOQuery): TList<TClosedPeriodModel>;
     function QueryToMachineStops(AQuery:TADOQuery): TList<TMachineStopModel>;
     function QueryToCalendars(AQuery:TADOQuery): TList<TCalendarModel>;
-    function QueryToWeekCalendar(AQuery:TADOQuery): TList<Double>;
 
     procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
 end;
@@ -227,35 +226,6 @@ begin
       LPhase.WorkTime := AQuery.FieldByName(PHASE_WORKTIME).AsFloat;
       LPhase.Quantity := AQuery.FieldByName(PO_PIECES).AsFloat;
       Result.Add(LPhase);
-      AQuery.Next;
-    end;
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
-  end;
-end;
-
-function TQueryUtilityHandler.QueryToWeekCalendar(
-  AQuery: TADOQuery): TList<Double>;
-var
-  I: Integer;
-begin
-  //initialize result list
-  Result := TList<Double>.Create;
-  for I := 0 to 7 do
-  begin
-    Result.Add(0);
-  end;
-
-  try
-    if not AQuery.Active then
-      raise Exception.Create(DATASET_CLOSED);
-    AQuery.First;
-    while not AQuery.Eof do
-    begin
-      Result[AQuery.FieldByName(GIORNO).AsInteger] := AQuery.FieldByName(CALENDAR_TOTORE).AsFloat;
       AQuery.Next;
     end;
   except

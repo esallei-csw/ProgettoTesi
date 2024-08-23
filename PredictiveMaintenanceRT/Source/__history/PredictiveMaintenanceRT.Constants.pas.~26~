@@ -58,7 +58,6 @@ const
   CALENDAR_DAY = 'GIORNO';
   CALENDAR_TOTORE = 'TotInOre';
   CALENDAR_STARTDAY = 'GGINIZIO';
-  GIORNO = 'GIORNO';
 
   QUERY_PARTIALS = 'select ID, Inizio, TemLav*24 as TempoLavoroInOre, Fine, QtOut, IDARTICO from OPSdlPar where (IDCelPro = %s) AND (Inizio > %s) order by ID desc';
 
@@ -80,10 +79,6 @@ const
                     'join PROFTES on PROFTES.ID = PROFDET.IDPROFTES '+
                     'where IDCELPRO = %s and VARIANTE =''0000''';
 
-
-  QUERY_WEEK_CALENDAR = 'select GIORNO, TOTORE*24 as TotInOre '+
-                        'from PROFDET '+
-                        'where IDPROFTES = 1 and VARIANTE	= ''0000''';
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +
                       'Persist Security Info=False;' +
                       'User ID=%s;' +

@@ -49,7 +49,6 @@ contains
   PredictiveMaintenanceRT.QueryUtilityHandler in 'Source\PredictiveMaintenanceRT.QueryUtilityHandler.pas',
   PredictiveMaintenanceRT.ClosedPeriodModel in 'Source\PredictiveMaintenanceRT.ClosedPeriodModel.pas',
   PredictiveMaintenanceRT.MachineStopModel in 'Source\PredictiveMaintenanceRT.MachineStopModel.pas',
-  PredictiveMaintenanceRT.CalendarDayModel in 'Source\PredictiveMaintenanceRT.CalendarDayModel.pas',
   PredictiveMaintenanceRT.CalendarModel in 'Source\PredictiveMaintenanceRT.CalendarModel.pas';
 
 end.

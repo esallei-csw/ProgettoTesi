@@ -216,7 +216,7 @@ begin
     end
     else
     begin
-      if GetDaysToMaintenance(LMaintenanceData) <= 0 then
+      if (LMaintenanceData.ThresholdDays = 0) and (LMaintenanceData.ThresholdMonths = 0) then
       begin
         LPiecesToMaintenance := GetPiecesToMaintenance(ACell.TotalPartials, LMaintenanceData);
         LTimeToMaintenance := GetTimeToMaintenance(ACell.TotalPartials, LMaintenanceData);

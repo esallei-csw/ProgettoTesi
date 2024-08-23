@@ -97,7 +97,6 @@
         <DCCReference Include="Source\PredictiveMaintenanceRT.QueryUtilityHandler.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.ClosedPeriodModel.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.MachineStopModel.pas"/>
-        <DCCReference Include="Source\PredictiveMaintenanceRT.CalendarDayModel.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.CalendarModel.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
