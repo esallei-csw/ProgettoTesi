@@ -70,7 +70,12 @@ begin
 end;
 procedure TWorkHoursCalculator.InitializeCalendar;
 begin
-  FCalendar := QueryHandler.GetCalendarData(FIDCell);
+
+  //get only calendar
+  FCalendar := query
+  //get week from calendar x
+  //modificare i model e le query
+
 end;
 
 function TWorkHoursCalculator.IsHoliday(const ADate: Double): Boolean;
@@ -80,9 +85,7 @@ end;
 
 function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): TList<Double>;
 begin
-  //check fcalendare and find correct calendar
 
-  //get calendar week of that calendar
 end;
 
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;

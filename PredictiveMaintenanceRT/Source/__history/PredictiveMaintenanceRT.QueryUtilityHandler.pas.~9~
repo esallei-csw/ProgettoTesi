@@ -7,7 +7,7 @@ uses
   PredictiveMaintenanceRT.PartialModel, PredictiveMaintenanceRT.MaintenanceModel,
   PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.ProductionOrderModel,
   PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.MachineStopModel,
-  PredictiveMaintenanceRT.CalendarModel;
+  PredictiveMaintenanceRT.CalendarDayModel;
 
 type TQueryUtilityHandler = class
 
@@ -23,7 +23,7 @@ type TQueryUtilityHandler = class
     function QueryToCellsList(AQuery:TADOQuery): TList<integer>;
     function QueryToClosedPeriods(AQuery:TADOQuery): TList<TClosedPeriodModel>;
     function QueryToMachineStops(AQuery:TADOQuery): TList<TMachineStopModel>;
-    function QueryToCalendars(AQuery:TADOQuery): TList<TCalendarModel>;
+    function QueryToCalendar(AQuery:TADOQuery): TList<TCalendarDayModel>;
 
     procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
 end;
@@ -35,21 +35,24 @@ uses
 
 { TQueryUtilityHandler }
 
-function TQueryUtilityHandler.QueryToCalendars(
-  AQuery: TADOQuery): TList<TCalendarModel>;
+function TQueryUtilityHandler.QueryToCalendar(
+  AQuery: TADOQuery): TList<TCalendarDayModel>;
 var
-  LDay: TCalendarModel;
+  LDay: TCalendarDayModel;
 begin
-  Result := TList<TCalendarModel>.Create;
+  Result := TList<TCalendarDayModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
     AQuery.First;
     while not AQuery.Eof do
     begin
-      LDay := TCalendarModel.Create;
-      LDay.IDCelPro := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LDay := TCalendarDayModel.Create;
+      LDay.ID := AQuery.FieldByName(ID).AsInteger;
       LDay.IDCalendar := AQuery.FieldByName(CALENDAR_ID).AsInteger;
+      LDay.IDCell := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LDay.Day := AQuery.FieldByName(CALENDAR_DAY).AsInteger;
+      LDay.TotOre := AQuery.FieldByName(CALENDAR_TOTORE).AsFloat;
       LDay.StartDay := AQuery.FieldByName(CALENDAR_STARTDAY).AsFloat;
       Result.Add(LDay);
       AQuery.Next;
