@@ -64,9 +64,7 @@ var
   LResultItem: TResultModel;
 begin
   PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
-
   FResultList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
-
   lvMaintenanceDates.Items.BeginUpdate;
 
   try

@@ -97,15 +97,16 @@ const
                         'from ALLARMI '+
                         'where IDCELPRO = %s and APERTO = 0';
 
-  QUERY_CALENDAR = 'select PROFASS.IDPROFTES, PROFASS.IDCELPRO, PROFASS.GGINIZIO ' +
-                    'from PROFASS ' +
-                      'join PROFTES on PROFTES.ID = PROFASS.IDPROFTES '+
-                    'where PROFASS.IDCELPRO = %s '+
+  QUERY_CALENDAR = 'select PROFDET.ID, PROFASS.IDPROFTES, GIORNO, TOTORE*24 as TotInOre, IDCELPRO, GGINIZIO ' +
+                    'from PROFDET '+
+                    'join PROFASS on PROFASS.IDPROFTES = PROFDET.IDPROFTES '+
+                    'join PROFTES on PROFTES.ID = PROFDET.IDPROFTES '+
+                    'where IDCELPRO = %s and VARIANTE =''0000'' '+
                     'order by GGINIZIO ';
 
   QUERY_WEEK_CALENDAR = 'select GIORNO, TOTORE*24 as TotInOre '+
                         'from PROFDET '+
-                        'where IDPROFTES = %s and VARIANTE	= ''0000''';
+                        'where IDPROFTES =  and VARIANTE	= ''0000''';
 
 
 

@@ -99,7 +99,7 @@ const
 
   QUERY_CALENDAR = 'select PROFASS.IDPROFTES, PROFASS.IDCELPRO, PROFASS.GGINIZIO ' +
                     'from PROFASS ' +
-                      'join PROFTES on PROFTES.ID = PROFASS.IDPROFTES '+
+                      'join PROFTES on PROFTES.ID = PROFDET.IDPROFTES '+
                     'where PROFASS.IDCELPRO = %s '+
                     'order by GGINIZIO ';
 

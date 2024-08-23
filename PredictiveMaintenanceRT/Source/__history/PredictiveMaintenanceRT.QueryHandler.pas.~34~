@@ -5,7 +5,8 @@ interface
 uses
   PredictiveMaintenanceRT.CellDataModel, PredictiveMaintenanceRT.PartialModel, Data.Win.ADODB, System.Generics.Collections,
   PredictiveMaintenanceRT.QueryExecutor, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel,
-  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.QueryUtilityHandler;
+  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.QueryUtilityHandler,
+  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.CalendarModel;
 
 type
   TQueryHandler = class
@@ -17,7 +18,7 @@ type
     FQueryExecutor: TQueryExecutor;
     FQueryUtilityHandler: TQueryUtilityHandler;
 
-    function PopulateCell<T>(const AQuery: string; AFunc: TFunc<T>): TList<T>;
+    function PopulateCell<T>(const AQuery: string; AFunc: TFunc<T>): TList<T>; overload;
 
     function PopulateProductionOrders(APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
 
@@ -31,13 +32,27 @@ type
   {Public declarations}
     function PopulateCellModel(ACellId: integer): TCellDataModel;
     function GetCellsList: TList<integer>;
+    function GetClosedPeriods(ACellId: integer): TList<TClosedPeriodModel>;
+    function GetCalendarData(ACellId: integer): TList<TCalendarModel>;
+    function GetWeekCalendar(ACalendarId: integer): TDictionary<integer, double>;
   end;
 
 implementation
 
 { TQueryHandler }
 uses
-  PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages;
+  PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.MachineStopModel;
+
+function TQueryHandler.GetCalendarData(ACellId: integer): TList<TCalendarModel>;
+var
+  LCalendarId: TCalendarModel;
+begin
+  Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToCalendars);
+
+  for LCalendarId in Result do
+    LCalendarId.HourDaily := GetWeekCalendar(LCalendarId.IDCalendar);
+
+end;
 
 function TQueryHandler.GetCellsList: TList<integer>;
 var
@@ -56,6 +71,12 @@ begin
 
 end;
 
+function TQueryHandler.GetClosedPeriods(
+  ACellId: integer): TList<TClosedPeriodModel>;
+begin
+  Result := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToClosedPeriods);
+end;
+
 function TQueryHandler.GetQueryExecutor: TQueryExecutor;
 begin
   if not Assigned(FQueryExecutor) then
@@ -70,6 +91,41 @@ begin
   Result := FQueryUtilityHandler;
 end;
 
+function TQueryHandler.GetWeekCalendar(ACalendarId: integer): TDictionary<integer, double>;
+var
+  LQrySel: TADOQuery;
+begin
+  //initialize result list
+  Result := TDictionary<integer, double>.Create;
+
+
+  LQrySel := TADOQuery.Create(nil);
+  try
+    LQrySel.SQL.Text := Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]);
+    try
+      LQrySel.Open;
+      while not LQrySel.Eof do
+      begin
+        Result.Add(
+          LQrySel.FieldByName(GIORNO).AsInteger
+          , LQrySel.FieldByName(CALENDAR_TOTORE).AsFloat
+        );
+
+        LQrySel.Next;
+      end;
+    except
+      begin
+        Result.Free;
+        raise;
+      end;
+    end;
+
+    // Result := PopulateCell<Double>(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]), QueryUtilityHandler.QueryToWeekCalendar);
+  finally
+    LQrySel.Free;
+  end;
+end;
+
 function TQueryHandler.PopulateCellModel(ACellId: integer): TCellDataModel;
 begin
   Result := TCellDataModel.Create;
@@ -78,13 +134,14 @@ begin
 
     Result.MaintenanceData := PopulateCell<TMaintenanceModel>(Format(QUERY_MAINTENANCE ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToMaintenanceData);
 
-    Result.Partials := PopulateCell<TPartialModel>(Format(QUERY_PARTIALS, [intToStr(ACellId), FloatToStr(Result.MaintenanceData[0].LastMaintenance)]), QueryUtilityHandler.QueryToPartialsList);
-
     Result.TotalPartials := PopulateCell<TPartialModel>(Format(QUERY_TOTAL_PARTIALS, [intToStr(ACellId)]), QueryUtilityHandler.QueryToPartialsList);
 
     Result.ProductionOrders := PopulateProductionOrders(PopulateCell<TPhaseModel>(Format(QUERY_PHASES ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToPhaseList));
 
     QueryUtilityHandler.WorkHoursSum(Result.ProductionOrders);
+
+    Result.MachineStops := PopulateCell<TMachineStopModel>(Format(QUERY_MACHINESTOPS, [IntToStr(ACellId)]), QueryUtilityHandler.QueryToMachineStops);
+
   except
     begin
       Result.Free;

@@ -40,8 +40,15 @@ uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
 function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+var
+  LCelData: TCellDataModel;
 begin
-  Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
+  LCelData := GetCellModel(ACellId);
+  try
+    Result := PredictiveAlgorithm.CalculateMaintenanceDate(LCelData);
+  finally
+    LCelData.Free;
+  end;
 end;
 
 function TPredictiveMaintenance.GetCellsList: TList<integer>;

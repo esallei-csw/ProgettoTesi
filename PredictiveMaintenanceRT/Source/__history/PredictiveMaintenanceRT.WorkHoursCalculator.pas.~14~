@@ -18,7 +18,8 @@ type
     FCalendar: TList<TCalendarModel>;
     function IsHoliday(const ADate: Double): Boolean;
     procedure AddClosedPeriods;
-    function GetCalendarWeek(ADate: Double): Double;
+    procedure InitializeCalendar;
+    function GetCalendarWeek(ADate: Double): TList<Double>;
 
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read GetQueryHandler write FQueryHandler;
@@ -38,7 +39,7 @@ begin
   FIDCell := ACellId;
   FHolidayList := TList<Double>.Create;
   AddClosedPeriods;
-  FCalendar := QueryHandler.GetCalendarData(FIDCell);
+  InitializeCalendar;
 end;
 destructor TWorkHoursCalculator.Destroy;
 begin
@@ -67,33 +68,33 @@ procedure TWorkHoursCalculator.AddHoliday(const AHoliday: Double);
 begin
   FHolidayList.Add(AHoliday);
 end;
+procedure TWorkHoursCalculator.InitializeCalendar;
+begin
+  FCalendar := QueryHandler.GetCalendarData(FIDCell);
+end;
 
 function TWorkHoursCalculator.IsHoliday(const ADate: Double): Boolean;
 begin
   Result := FHolidayList.Contains(ADate);
 end;
 
-function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): Double;
+function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): TList<Double>;
 var
   LCalendar: TCalendarModel;
-  LResCalendar: TCalendarModel;
+  LDateTmp: Double;
+  LResultID: integer;
 begin
-
-  LResCalendar := nil;
   //select correct calendar for ADate
   for LCalendar in FCalendar do
   begin
-    if (LCalendar.StartDay <= ADate) and ( ( LResCalendar = nil ) or (LCalendar.StartDay > LResCalendar.StartDay ) )then
-      LResCalendar := LCalendar
-    else if ( LCalendar.StartDay > ADate ) then
-      Break;
+    if (LCalendar.StartDay < ADate) and (LCalendar.StartDay > LDateTmp) then
+    begin
+      LDateTmp := LCalendar.StartDay;
+      LResultID := LCalendar.IDCalendar;
+    end;
   end;
-
-  LResCalendar.HourDaily.TryGetValue(
-    DayOfTheWeek(ADate)
-    , Result
-  );
-
+  //get calendar week of correct calendar
+  Result := QueryHandler.GetWeekCalendar(LResultID);
 end;
 
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;
@@ -108,6 +109,6 @@ begin
   if IsHoliday(ADate) then
     Exit(0);
 
-  Result := GetCalendarWeek(ADate);
+  Result := GetCalendarWeek(ADate)[DayOfTheWeek(ADate)];
 end;
 end.

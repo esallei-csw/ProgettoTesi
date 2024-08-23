@@ -18,7 +18,7 @@ type
     FQueryExecutor: TQueryExecutor;
     FQueryUtilityHandler: TQueryUtilityHandler;
 
-    function PopulateCell<T>(const AQuery: string; AFunc: TFunc<T>): TList<T>;
+    function PopulateCell<T>(const AQuery: string; AFunc: TFunc<T>): TList<T>; overload;
 
     function PopulateProductionOrders(APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
 
@@ -34,7 +34,7 @@ type
     function GetCellsList: TList<integer>;
     function GetClosedPeriods(ACellId: integer): TList<TClosedPeriodModel>;
     function GetCalendarData(ACellId: integer): TList<TCalendarModel>;
-    function GetWeekCalendar(ACalendarId: integer): TList<Double>;
+    function GetWeekCalendar(ACalendarId: integer): TDictionary<integer, double>;
   end;
 
 implementation
@@ -44,8 +44,14 @@ uses
   PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.MachineStopModel;
 
 function TQueryHandler.GetCalendarData(ACellId: integer): TList<TCalendarModel>;
+var
+  LCalendarId: TCalendarModel;
 begin
   Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToCalendars);
+
+  for LCalendarId in Result do
+    LCalendarId.HourDaily := GetWeekCalendar(LCalendarId.IDCalendar);
+
 end;
 
 function TQueryHandler.GetCellsList: TList<integer>;
@@ -85,9 +91,37 @@ begin
   Result := FQueryUtilityHandler;
 end;
 
-function TQueryHandler.GetWeekCalendar(ACalendarId: integer): TList<Double>;
+function TQueryHandler.GetWeekCalendar(ACalendarId: integer): TDictionary<integer, double>;
+var
+  LQrySel: TADOQuery;
 begin
-  Result := PopulateCell<Double>(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]), QueryUtilityHandler.QueryToWeekCalendar);
+  //initialize result list
+  Result := TDictionary<integer, double>.Create;
+
+
+  LQrySel := QueryExecutor.ExecuteQuery(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]));
+  try
+    try
+      while not LQrySel.Eof do
+      begin
+        Result.Add(
+          LQrySel.FieldByName(GIORNO).AsInteger
+          , LQrySel.FieldByName(CALENDAR_TOTORE).AsFloat
+        );
+
+        LQrySel.Next;
+      end;
+    except
+      begin
+        Result.Free;
+        raise;
+      end;
+    end;
+
+    // Result := PopulateCell<Double>(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]), QueryUtilityHandler.QueryToWeekCalendar);
+  finally
+    LQrySel.Free;
+  end;
 end;
 
 function TQueryHandler.PopulateCellModel(ACellId: integer): TCellDataModel;
