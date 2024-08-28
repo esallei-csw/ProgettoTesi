@@ -38,9 +38,9 @@ implementation
 constructor TCellDataModel.Create;
 begin
   FCellId := varEmpty;
-  FMaintenanceData := TList<TMaintenanceModel>.Create;
+  FMaintenanceData := nil;
   FProductionOrders := TList<TProductionOrderModel>.Create;
-  FTotalPartials := TList<TPartialModel>.Create;
+  FTotalPartials := nil;
   FMachineStops := TList<TMachineStopModel>.Create;
 end;
 
@@ -48,6 +48,14 @@ destructor TCellDataModel.Destroy;
 var
   I: integer;
 begin
+//  for I := 0 to FMaintenanceData.Count - 1 do
+//    FMaintenanceData[I].Free;
+//  for I := 0 to FProductionOrders.Count - 2 do
+//    FProductionOrders[I].Free;
+//  for I := 0 to FTotalPartials.Count - 2 do
+//    FTotalPartials[I].Free;
+//  for I := 0 to FMachineStops.Count - 1 do
+//    FMachineStops[I].Free;
   FMaintenanceData.Free;
   FProductionOrders.Free;
   FTotalPartials.Free;

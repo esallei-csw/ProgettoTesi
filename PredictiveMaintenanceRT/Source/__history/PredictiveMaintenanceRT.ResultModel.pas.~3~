@@ -10,7 +10,6 @@ type
 
     private
     {Private declarations}
-    FCellID: integer;
     FDescription: string;
     FMaintenanceDate: Double;
     FPercent: Double;
@@ -19,7 +18,6 @@ type
     {Public declarations}
     constructor Create;
     destructor Destroy; override;
-    property CellID: integer read FCellID write FCellID;
     property Description: string read FDescription write FDescription;
     property MaintenanceDate: Double read FMaintenanceDate write FMaintenanceDate;
     property Percent: Double read FPercent write FPercent;
@@ -32,7 +30,6 @@ implementation
 
 constructor TResultModel.Create;
 begin
-  FCellID := varEmpty;
   FDescription := '';
   FMaintenanceDate := varEmpty;
   FPercent := varEmpty;

@@ -40,12 +40,15 @@ begin
 end;
 
 function TQueryExecutor.ExecuteQuery(SQL: string): TADOQuery;
+//var
+//  LQuery: TADOQuery;
 begin
   Result := TADOQuery.Create(nil);
   try
     Result.Connection := FConnection;
     Result.SQL.Text := SQL;
     Result.Open;
+//    Result := LQuery;
   except
     on E: Exception do
     begin

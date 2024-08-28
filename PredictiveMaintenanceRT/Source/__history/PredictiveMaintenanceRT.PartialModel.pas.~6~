@@ -35,4 +35,5 @@ begin
   FQuantity := varEmpty;
   FIDArtico := varEmpty;
 end;
+
 end.

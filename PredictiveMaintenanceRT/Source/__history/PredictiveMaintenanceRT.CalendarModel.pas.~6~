@@ -19,7 +19,7 @@ type
   public
   {Public declarations}
   constructor Create;
-  destructor Destroy; override;
+  destructor Destroy;
 
   property IDCelPro: integer read FIDCelPro write FIDCelPro;
   property IDCalendar: integer read FIDCalendar write FIDCalendar;
@@ -46,7 +46,6 @@ destructor TCalendarModel.Destroy;
 begin
   if Assigned(FHourDaily) then
     FHourDaily.Free;
-  inherited;
 end;
 
 end.

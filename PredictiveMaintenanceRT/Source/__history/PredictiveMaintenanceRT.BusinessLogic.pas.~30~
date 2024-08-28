@@ -47,8 +47,9 @@ begin
   LCellData := GetCellModel(ACellId);
   try
     Result := PredictiveAlgorithm.CalculateMaintenanceDate(LCellData);
+//    Result := TList<TResultModel>.Create;
   finally
-    LCellData.Free;
+//    LCellData.Free;
   end;
 end;
 
@@ -57,7 +58,7 @@ function TPredictiveMaintenance.GetMaintenanceDates(
 var
   LCellID: integer;
 begin
-  Result := TList<TResultModel>.Create;
+
   for LCellID in ACellIDs do
   begin
     Result.AddRange(GetMaintenanceDate(LCellID));

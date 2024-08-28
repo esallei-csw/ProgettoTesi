@@ -30,6 +30,7 @@ type
 
   public
   {Public declarations}
+    destructor Destroy; override;
     function PopulateCellModel(ACellId: integer): TCellDataModel;
     function GetCellsList: TList<integer>;
     function GetClosedPeriods(ACellId: integer): TList<TClosedPeriodModel>;
@@ -43,12 +44,22 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.MachineStopModel;
 
+destructor TQueryHandler.Destroy;
+begin
+  if Assigned(FQueryExecutor) then
+    FQueryExecutor.Free;
+  if Assigned(FQueryUtilityHandler) then
+    FQueryUtilityHandler.Free;
+  inherited;
+end;
+
 function TQueryHandler.GetCalendarData(ACellId: integer): TList<TCalendarModel>;
 var
   LCalendarId: TCalendarModel;
 begin
+  //get Calendars
   Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToCalendars);
-
+  //populate week calendar for each calendar found
   for LCalendarId in Result do
     LCalendarId.HourDaily := GetWeekCalendar(LCalendarId.IDCalendar);
 
@@ -153,23 +164,34 @@ function TQueryHandler.PopulateProductionOrders(
 var
   LPhase: TPhaseModel;
   LProductionOrder: TProductionOrderModel;
+  I: Integer;
 begin
   Result := TList<TProductionOrderModel>.Create;
   LProductionOrder := TProductionOrderModel.Create;
   try
-    for LPhase in APhases do
-    begin
-      if LPhase.POID <> LProductionOrder.POID then
+    try
+      for LPhase in APhases do
       begin
-        LProductionOrder := TProductionOrderModel.Create;
-        LProductionOrder.POID := LPhase.POID;
-        Result.Add(LProductionOrder);
+        if LPhase.POID <> LProductionOrder.POID then
+        begin
+          LProductionOrder := TProductionOrderModel.Create;
+          LProductionOrder.POID := LPhase.POID;
+          Result.Add(LProductionOrder);
+        end;
+        LProductionOrder.Phases.Add(LPhase);
       end;
-      LProductionOrder.Phases.Add(LPhase);
+    except
+      Result.Free;
+      raise Exception.Create(PO_ERROR);
     end;
-  except
-    Result.Free;
-    raise Exception.Create(PO_ERROR);
+  finally
+
+//    for I := 0 to APhases.Count - 1 do
+//      APhases[I].Free;
+
+    LPhase.Free;
+    APhases.Free;
+    LProductionOrder.Free;
   end;
 end;
 

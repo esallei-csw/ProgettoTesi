@@ -21,19 +21,17 @@ type
     lbCellsList: TListBox;
     lblCells: TLabel;
     btnGetCellsList: TButton;
-    btnGetMaintenanceDates: TButton;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
     procedure btnGetCellsListClick(Sender: TObject);
-    procedure btnGetMaintenanceDatesClick(
-  Sender: TObject);
   private
     { Private declarations }
     FResultList: TList<TResultModel>;
     FPredictiveMaintenance: TPredictiveMaintenance;
+
 
     function GetPredictiveMaintenance: TPredictiveMaintenance;
     property PredictiveMaintenance: TPredictiveMaintenance read GetPredictiveMaintenance write FPredictiveMaintenance;
@@ -76,41 +74,13 @@ begin
     for LResultItem in FResultList do
     begin
       LListItem := lvMaintenanceDates.Items.Add;
-      LListItem.Caption := IntToStr(LResultItem.CellID);
-      LListItem.SubItems.Add(LResultItem.Description);
+      LListItem.Caption := LResultItem.Description;
       LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
       LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
     end;
   finally
-    lvMaintenanceDates.Items.EndUpdate;
-  end;
-end;
-
-procedure TfrmPredictiveMaintenance.btnGetMaintenanceDatesClick(
-  Sender: TObject);
-var
-  LListItem: TListItem;
-  LResultItem: TResultModel;
-begin
-  PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
-
-  FResultList := PredictiveMaintenance.GetMaintenanceDates(PredictiveMaintenance.GetCellsList);
-
-  lvMaintenanceDates.Items.BeginUpdate;
-
-  try
-    lvMaintenanceDates.Items.Clear;
-    for LResultItem in FResultList do
-    begin
-      LListItem := lvMaintenanceDates.Items.Add;
-      LListItem.Caption := IntToStr(LResultItem.CellID);
-      LListItem.SubItems.Add(LResultItem.Description);
-      LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
-      LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
+      lvMaintenanceDates.Items.EndUpdate;
     end;
-  finally
-    lvMaintenanceDates.Items.EndUpdate;
-  end;
 end;
 
 procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);
@@ -123,9 +93,6 @@ procedure TfrmPredictiveMaintenance.FormDestroy(Sender: TObject);
 begin
   if Assigned(FPredictiveMaintenance) then
     FPredictiveMaintenance.Free;
-  if Assigned(FResultList) then
-    FResultList.Free;
-  inherited;
 end;
 
 function TfrmPredictiveMaintenance.GetPredictiveMaintenance: TPredictiveMaintenance;

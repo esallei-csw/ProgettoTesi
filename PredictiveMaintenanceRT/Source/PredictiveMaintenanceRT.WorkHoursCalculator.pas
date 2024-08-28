@@ -14,7 +14,6 @@ type
     FIDCell: integer;
     FHolidayList: TList<Double>;
     FQueryHandler: TQueryHandler;
-    FClosedPeriods: TList<TClosedPeriodModel>;
     FCalendar: TList<TCalendarModel>;
     function IsHoliday(const ADate: Double): Boolean;
     procedure AddClosedPeriods;
@@ -43,23 +42,33 @@ end;
 destructor TWorkHoursCalculator.Destroy;
 begin
   FHolidayList.Free;
+  if Assigned(FQueryHandler) then
+    FQueryHandler.Free;
+  FCalendar.Free;
+
   inherited;
 end;
 procedure TWorkHoursCalculator.AddClosedPeriods;
 var
   LClosedPeriod: TClosedPeriodModel;
+  LClosedPeriods: TList<TClosedPeriodModel>;
   LCPDay: Double;
 begin
-  FClosedPeriods := QueryHandler.GetClosedPeriods(FIDCell);
-
-  for LClosedPeriod in FClosedPeriods do
-  begin
-    LCPDay := LClosedPeriod.DataInizio;
-    while LCPDay <> LClosedPeriod.DataFine do
+  LClosedPeriod := TClosedPeriodModel.Create;
+  LClosedPeriods := QueryHandler.GetClosedPeriods(FIDCell);
+  try
+    for LClosedPeriod in LClosedPeriods do
     begin
-      AddHoliday(LCPDay);
-      LCPDay := LCPDay + 1;
+      LCPDay := LClosedPeriod.DataInizio;
+      while LCPDay <> LClosedPeriod.DataFine do
+      begin
+        AddHoliday(LCPDay);
+        LCPDay := LCPDay + 1;
+      end;
     end;
+  finally
+    LClosedPeriod.Free;
+    LClosedPeriods.Free;
   end;
 end;
 

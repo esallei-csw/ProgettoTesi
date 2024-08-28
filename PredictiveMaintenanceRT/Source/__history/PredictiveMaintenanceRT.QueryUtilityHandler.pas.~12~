@@ -5,7 +5,9 @@ interface
 uses
   Data.Win.ADODB, System.Generics.Collections,
   PredictiveMaintenanceRT.PartialModel, PredictiveMaintenanceRT.MaintenanceModel,
-  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.ProductionOrderModel;
+  PredictiveMaintenanceRT.PhaseModel, PredictiveMaintenanceRT.ProductionOrderModel,
+  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.MachineStopModel,
+  PredictiveMaintenanceRT.CalendarModel;
 
 type TQueryUtilityHandler = class
 
@@ -19,6 +21,10 @@ type TQueryUtilityHandler = class
     function QueryToMaintenanceData(AQuery: TADOQuery): TList<TMaintenanceModel>;
     function QueryToPhaseList(AQuery: TADOQuery): TList<TPhaseModel>;
     function QueryToCellsList(AQuery:TADOQuery): TList<integer>;
+    function QueryToClosedPeriods(AQuery:TADOQuery): TList<TClosedPeriodModel>;
+    function QueryToMachineStops(AQuery:TADOQuery): TList<TMachineStopModel>;
+    function QueryToCalendars(AQuery:TADOQuery): TList<TCalendarModel>;
+    function QueryToWeekCalendar(AQuery:TADOQuery): TList<Double>;
 
     procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
 end;
@@ -29,6 +35,34 @@ uses
   PredictiveMaintenanceRT.Constants, System.SysUtils, PredictiveMaintenanceRT.Messages;
 
 { TQueryUtilityHandler }
+
+function TQueryUtilityHandler.QueryToCalendars(
+  AQuery: TADOQuery): TList<TCalendarModel>;
+var
+  LDay: TCalendarModel;
+begin
+  Result := TList<TCalendarModel>.Create;
+  try
+    if not AQuery.Active then
+      raise Exception.Create(DATASET_CLOSED);
+    AQuery.First;
+    while not AQuery.Eof do
+    begin
+      LDay := TCalendarModel.Create;
+      LDay.IDCelPro := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LDay.IDCalendar := AQuery.FieldByName(CALENDAR_ID).AsInteger;
+      LDay.StartDay := AQuery.FieldByName(CALENDAR_STARTDAY).AsFloat;
+
+      Result.Add(LDay);
+      AQuery.Next;
+    end;
+  except
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
 
 function TQueryUtilityHandler.QueryToCellsList(
   AQuery: TADOQuery): TList<integer>;
@@ -42,7 +76,7 @@ begin
     AQuery.First;
     while not AQuery.Eof do
     begin
-      LCellId := AQuery.FieldByName('IDCELPRO').AsInteger;
+      LCellId := AQuery.FieldByName(IDCELPRO).AsInteger;
       Result.Add(LCellId);
       AQuery.Next;
     end;
@@ -67,13 +101,74 @@ begin
     while not AQuery.Eof do
     begin
       LPartial := TPartialModel.Create;
-      LPartial.PartialId := AQuery.FieldByName(PARTIAL_ID).AsInteger;
+      LPartial.PartialId := AQuery.FieldByName(ID).AsInteger;
       LPartial.StartTime := AQuery.FieldByName(PARTIAL_START).AsFloat;
       LPartial.WorkHours := AQuery.FieldByName(PARTIAL_WORKHOURS).AsFloat;
       LPartial.EndTime := AQuery.FieldByName(PARTIAL_END).AsFloat;
       LPartial.Quantity := AQuery.FieldByName(PARTIAL_QUANTITY).AsFloat;
       LPartial.IDArtico := AQuery.FieldByName(PARTIAL_IDARTICO).AsInteger;
       Result.Add(LPartial);
+      AQuery.Next;
+    end;
+  except
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
+
+function TQueryUtilityHandler.QueryToClosedPeriods(
+  AQuery: TADOQuery): TList<TClosedPeriodModel>;
+var
+  LPeriod: TClosedPeriodModel;
+begin
+  Result := TList<TClosedPeriodModel>.Create;
+  try
+    if not AQuery.Active then
+      raise Exception.Create(DATASET_CLOSED);
+    AQuery.First;
+    while not AQuery.Eof do
+    begin
+      LPeriod := TClosedPeriodModel.Create;
+      LPeriod.ID := AQuery.FieldByName(ID).AsInteger;
+      LPeriod.IDCell := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LPeriod.DataInizio := AQuery.FieldByName(CPERIOD_DATAINI).AsFloat;
+      LPeriod.DataFine := AQuery.FieldByName(CPERIOD_DATAFIN).AsFloat;
+      LPeriod.Tipo := AQuery.FieldByName(CPERIOD_TIPO).AsString;
+      LPeriod.Duration := AQuery.FieldByName(CPERIOD_DURATION).AsInteger;
+      Result.Add(LPeriod);
+      AQuery.Next;
+    end;
+  except
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
+
+function TQueryUtilityHandler.QueryToMachineStops(
+  AQuery: TADOQuery): TList<TMachineStopModel>;
+var
+  LMachineStop: TMachineStopModel;
+begin
+  Result := TList<TMachineStopModel>.Create;
+  try
+    if not AQuery.Active then
+      raise Exception.Create(DATASET_CLOSED);
+    AQuery.First;
+    while not AQuery.Eof do
+    begin
+      LMachineStop := TMachineStopModel.Create;
+      LMachineStop.ID := AQuery.FieldByName(ID).AsInteger;
+      LMachineStop.IDCell := AQuery.FieldByName(IDCELPRO).AsInteger;
+      LMachineStop.DataInizio := AQuery.FieldByName(STOPS_DATAIN).AsFloat;
+      LMachineStop.DataFine := AQuery.FieldByName(STOPS_DATAFIN).AsFloat;
+      LMachineStop.OraInizio := AQuery.FieldByName(STOPS_ORAIN).AsFloat;
+      LMachineStop.OraFine := AQuery.FieldByName(STOPS_ORAFIN).AsFloat;
+      LMachineStop.Durata := AQuery.FieldByName(STOPS_DURATA).AsFloat;
+      Result.Add(LMachineStop);
       AQuery.Next;
     end;
   except
@@ -133,6 +228,35 @@ begin
       LPhase.WorkTime := AQuery.FieldByName(PHASE_WORKTIME).AsFloat;
       LPhase.Quantity := AQuery.FieldByName(PO_PIECES).AsFloat;
       Result.Add(LPhase);
+      AQuery.Next;
+    end;
+  except
+    begin
+      Result.Free;
+      raise;
+    end;
+  end;
+end;
+
+function TQueryUtilityHandler.QueryToWeekCalendar(
+  AQuery: TADOQuery): TList<Double>;
+var
+  I: Integer;
+begin
+  //initialize result list
+  Result := TList<Double>.Create;
+  for I := 0 to 7 do
+  begin
+    Result.Add(0);
+  end;
+
+  try
+    if not AQuery.Active then
+      raise Exception.Create(DATASET_CLOSED);
+    AQuery.First;
+    while not AQuery.Eof do
+    begin
+      Result[AQuery.FieldByName(GIORNO).AsInteger] := AQuery.FieldByName(CALENDAR_TOTORE).AsFloat;
       AQuery.Next;
     end;
   except

@@ -4,7 +4,8 @@ interface
 
 uses
   System.SysUtils, System.DateUtils, System.Generics.Collections, PredictiveMaintenanceRT.QueryHandler,
-  PredictiveMaintenanceRT.ClosedPeriodModel;
+  PredictiveMaintenanceRT.ClosedPeriodModel,
+  PredictiveMaintenanceRT.CalendarModel;
 
 
 type
@@ -14,8 +15,10 @@ type
     FHolidayList: TList<Double>;
     FQueryHandler: TQueryHandler;
     FClosedPeriods: TList<TClosedPeriodModel>;
+    FCalendar: TList<TCalendarModel>;
     function IsHoliday(const ADate: Double): Boolean;
-    procedure GetData;
+    procedure AddClosedPeriods;
+    function GetCalendarWeek(ADate: Double): Double;
 
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read GetQueryHandler write FQueryHandler;
@@ -34,22 +37,63 @@ constructor TWorkHoursCalculator.Create(ACellId: integer);
 begin
   FIDCell := ACellId;
   FHolidayList := TList<Double>.Create;
+  AddClosedPeriods;
+  FCalendar := QueryHandler.GetCalendarData(FIDCell);
 end;
 destructor TWorkHoursCalculator.Destroy;
 begin
   FHolidayList.Free;
   inherited;
 end;
+procedure TWorkHoursCalculator.AddClosedPeriods;
+var
+  LClosedPeriod: TClosedPeriodModel;
+  LCPDay: Double;
+begin
+  FClosedPeriods := QueryHandler.GetClosedPeriods(FIDCell);
+
+  for LClosedPeriod in FClosedPeriods do
+  begin
+    LCPDay := LClosedPeriod.DataInizio;
+    while LCPDay <> LClosedPeriod.DataFine do
+    begin
+      AddHoliday(LCPDay);
+      LCPDay := LCPDay + 1;
+    end;
+  end;
+end;
+
 procedure TWorkHoursCalculator.AddHoliday(const AHoliday: Double);
 begin
   FHolidayList.Add(AHoliday);
 end;
+
 function TWorkHoursCalculator.IsHoliday(const ADate: Double): Boolean;
 begin
   Result := FHolidayList.Contains(ADate);
 end;
-procedure TWorkHoursCalculator.GetData;
+
+function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): Double;
+var
+  LCalendar: TCalendarModel;
+  LResCalendar: TCalendarModel;
 begin
+
+  LResCalendar := nil;
+  //select correct calendar for ADate
+  for LCalendar in FCalendar do
+  begin
+    if (LCalendar.StartDay <= ADate) and ( ( LResCalendar = nil ) or (LCalendar.StartDay > LResCalendar.StartDay ) )then
+      LResCalendar := LCalendar
+    else if ( LCalendar.StartDay > ADate ) then
+      Break;
+  end;
+
+  LResCalendar.HourDaily.TryGetValue(
+    DayOfTheWeek(ADate)
+    , Result
+  );
+
 end;
 
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;
@@ -60,18 +104,10 @@ begin
 end;
 
 function TWorkHoursCalculator.GetWorkHours(ADate: Double): Double;
-var
-  DayOfWeek: Integer;
 begin
   if IsHoliday(ADate) then
     Exit(0);
 
-  // Determine the day of the week
-  DayOfWeek := DayOfTheWeek(ADate);
-  // Check if it's a weekend
-  if (DayOfWeek = DaySaturday) or (DayOfWeek = DaySunday) then
-    Exit(0);
-  // Otherwise, it's a standard workday
-  Result := 8;
+  Result := GetCalendarWeek(ADate);
 end;
 end.

@@ -2,8 +2,8 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   Left = 0
   Top = 0
   Caption = 'Predictive Maintenance'
-  ClientHeight = 456
-  ClientWidth = 654
+  ClientHeight = 422
+  ClientWidth = 562
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -38,7 +38,7 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   end
   object lblCells: TLabel
     Left = 24
-    Top = 208
+    Top = 152
     Width = 41
     Height = 13
     Caption = 'Cells List'
@@ -71,12 +71,9 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   object lvMaintenanceDates: TListView
     Left = 168
     Top = 40
-    Width = 465
+    Width = 386
     Height = 157
     Columns = <
-      item
-        Caption = 'Cell ID'
-      end
       item
         AutoSize = True
         Caption = 'Description'
@@ -95,14 +92,14 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   object lbWarningList: TListBox
     Left = 168
     Top = 227
-    Width = 465
+    Width = 386
     Height = 153
     ItemHeight = 13
     TabOrder = 4
   end
   object lbCellsList: TListBox
     Left = 24
-    Top = 227
+    Top = 171
     Width = 121
     Height = 153
     ItemHeight = 13
@@ -110,20 +107,11 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   end
   object btnGetCellsList: TButton
     Left = 24
-    Top = 386
+    Top = 330
     Width = 121
     Height = 50
     Caption = 'Get Cells List'
     TabOrder = 6
     OnClick = btnGetCellsListClick
-  end
-  object btnGetMaintenanceDates: TButton
-    Left = 24
-    Top = 146
-    Width = 121
-    Height = 51
-    Caption = 'Get Maintenance Dates'
-    TabOrder = 7
-    OnClick = btnGetMaintenanceDatesClick
   end
 end

@@ -45,8 +45,6 @@ begin
 end;
 
 destructor TCellDataModel.Destroy;
-var
-  I: integer;
 begin
   FMaintenanceData.Free;
   FProductionOrders.Free;

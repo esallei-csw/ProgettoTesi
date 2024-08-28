@@ -53,6 +53,7 @@ begin
         LDay.IDCelPro := AQuery.FieldByName(IDCELPRO).AsInteger;
         LDay.IDCalendar := AQuery.FieldByName(CALENDAR_ID).AsInteger;
         LDay.StartDay := AQuery.FieldByName(CALENDAR_STARTDAY).AsFloat;
+
         Result.Add(LDay);
         AQuery.Next;
       end;
@@ -63,7 +64,7 @@ begin
       end;
     end;
   finally
-//    LDay.Free;
+    LDay.Free;
   end;
 end;
 
@@ -121,7 +122,7 @@ begin
       end;
     end;
   finally
-//    LPartial.Free;
+    LPartial.Free;
   end;
 end;
 
@@ -155,7 +156,7 @@ begin
       end;
     end;
   finally
-//    LPeriod.Free;
+    LPeriod.Free;
   end;
 end;
 
@@ -190,7 +191,7 @@ begin
       end;
     end;
   finally
-//    LMachineStop.Free;
+    LMachineStop.Free;
   end;
 end;
 
@@ -224,7 +225,7 @@ begin
       end;
     end;
   finally
-//    LMaintenanceData.Free;
+    LMaintenanceData.Free;
   end;
 end;
 
@@ -257,7 +258,7 @@ begin
       end;
     end;
   finally
-//    LPhase.Free;
+    LPhase.Free;
   end;
 end;
 
@@ -306,8 +307,8 @@ begin
       end;
     end;
   finally
-//    LProductionOrder.Free;
-//    LPhase.Free;
+    LProductionOrder.Free;
+    LPhase.Free;
   end;
 end;
 end.

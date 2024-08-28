@@ -216,6 +216,7 @@ begin
       else
         Result.Add(CalcDateDays(LIndex, ACell));
       Result[LIndex].Description := LMaintenanceData.Description;
+      Result[LIndex].CellID := FIDCell;
     end;
     LIndex := LIndex + 1;
   end;
