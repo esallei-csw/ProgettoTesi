@@ -201,26 +201,30 @@ var
 begin
   Result := TList<TMaintenanceModel>.Create;
   try
-    if not AQuery.Active then
-      raise Exception.Create(DATASET_CLOSED);
-    AQuery.First;
-    while not AQuery.Eof do
-    begin
-      LMaintenanceData := TMaintenanceModel.Create;
-      LMaintenanceData.Description := AQuery.FieldByName(MAINTENANCE_DESCR).AsString;
-      LMaintenanceData.LastMaintenance := AQuery.FieldByName(ULTMAN).AsFloat;
-      LMaintenanceData.ThresholdPieces := AQuery.FieldByName(MAINTENANCE_QTA).AsInteger;
-      LMaintenanceData.ThresholdHoursWorked := AQuery.FieldByName(MAINTENANCE_HOURS).AsFloat;
-      LMaintenanceData.ThresholdDays := AQuery.FieldByName(GIORNI).AsInteger;
-      LMaintenanceData.ThresholdMonths := AQuery.FieldByName(MESI).AsInteger;
-      Result.Add(LMaintenanceData);
-      AQuery.Next;
+    try
+      if not AQuery.Active then
+        raise Exception.Create(DATASET_CLOSED);
+      AQuery.First;
+      while not AQuery.Eof do
+      begin
+        LMaintenanceData := TMaintenanceModel.Create;
+        LMaintenanceData.Description := AQuery.FieldByName(MAINTENANCE_DESCR).AsString;
+        LMaintenanceData.LastMaintenance := AQuery.FieldByName(ULTMAN).AsFloat;
+        LMaintenanceData.ThresholdPieces := AQuery.FieldByName(MAINTENANCE_QTA).AsInteger;
+        LMaintenanceData.ThresholdHoursWorked := AQuery.FieldByName(MAINTENANCE_HOURS).AsFloat;
+        LMaintenanceData.ThresholdDays := AQuery.FieldByName(GIORNI).AsInteger;
+        LMaintenanceData.ThresholdMonths := AQuery.FieldByName(MESI).AsInteger;
+        Result.Add(LMaintenanceData);
+        AQuery.Next;
+      end;
+    except
+      begin
+        Result.Free;
+        raise;
+      end;
     end;
-  except
-    begin
-      Result.Free;
-      raise;
-    end;
+  finally
+//    LMaintenanceData.Free;
   end;
 end;
 
@@ -292,12 +296,18 @@ var
   LProductionOrder: TProductionOrderModel;
   LPhase: TPhaseModel;
 begin
-  for LProductionOrder in AProductionOrders do
-  begin
-    for LPhase in LProductionOrder.Phases do
+  LProductionOrder := TProductionOrderModel.Create;
+  try
+    for LProductionOrder in AProductionOrders do
     begin
-      LProductionOrder.WorkHours := LProductionOrder.WorkHours + LPhase.WorkTime;
+      for LPhase in LProductionOrder.Phases do
+      begin
+        LProductionOrder.WorkHours := LProductionOrder.WorkHours + LPhase.WorkTime;
+      end;
     end;
+  finally
+//    LProductionOrder.Free;
+//    LPhase.Free;
   end;
 end;
 end.

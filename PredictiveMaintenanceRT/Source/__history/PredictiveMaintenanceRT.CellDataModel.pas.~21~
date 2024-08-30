@@ -48,18 +48,19 @@ destructor TCellDataModel.Destroy;
 var
   I: integer;
 begin
-  for I := 0 to FMaintenanceData.Count - 1 do
-    FMaintenanceData.Items[I].Free;
+//  for I := 0 to FMaintenanceData.Count - 1 do
+//    FMaintenanceData.Items[I].FreeInstance;
+  FMaintenanceData.Clear;
   FMaintenanceData.Free;
   for I := 0 to FTotalPartials.Count - 1 do
-    FTotalPartials.Items[I].Free;
+    FTotalPartials.Items[I].FreeInstance;
   FTotalPartials.Free;
   for I := 0 to FProductionOrders.Count - 1 do
     FProductionOrders.Items[I].Free;
   FProductionOrders.Free;
-  for I := 0 to FMachineStops.Count - 1 do
-    FMachineStops.Items[I].Free;
-  FMachineStops.Free;
+//  for I := 0 to FMachineStops.Count - 1 do
+//    FMachineStops.Items[I].FreeInstance;
+//  FMachineStops.Free;
   inherited;
 end;
 

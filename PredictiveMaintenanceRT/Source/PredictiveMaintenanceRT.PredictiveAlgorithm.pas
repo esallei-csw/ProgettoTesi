@@ -239,9 +239,15 @@ begin
   LResultTime := CalcDateTime(LTimeToMaintenance, AMaintenanceData.ThresholdHoursWorked, ACell);
 
   if LResultPieces.MaintenanceDate < LResultTime.MaintenanceDate then
-    Result := LResultPieces
+  begin
+    Result := LResultPieces;
+    LResultTime.Free;
+  end
   else
+  begin
     Result := LResultTime;
+    LResultPieces.Free;
+  end;
 end;
 
 constructor TPredictiveAlgorithm.Create;

@@ -6,7 +6,7 @@ uses
   PredictiveMaintenanceRT.BusinessLogicInterface, PredictiveMaintenanceRT.PredictiveAlgorithm,
   PredictiveMaintenanceRT.CellDataModel,
   PredictiveMaintenanceRT.PartialModel, Data.DB, System.Generics.Collections,
-  Data.Win.ADODB, PredictiveMaintenanceRT.QueryHandler;
+  Data.Win.ADODB, PredictiveMaintenanceRT.QueryHandler, PredictiveMaintenanceRT.ResultModel;
 
 type
   TPredictiveMaintenance = class(TInterfacedObject, IPredictiveMaintenance)
@@ -22,11 +22,13 @@ type
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read getQueryHandler write FQueryHandler;
 
-
-    function GetCellModel(ACellId: integer): TCellDataModel;
   public
     {Public declarations}
-    function GetMaintenanceDate(ACellId: integer): TList<Double>;
+    destructor Destroy; override;
+    function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+    procedure UsePastData(AFlag: boolean);
+    function GetCellsList: TList<integer>;
+    function GetMaintenanceDates(ACellIDs: TList<integer>): TList<TResultModel>;
 
   end;
 
@@ -36,15 +38,43 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
-function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<Double>;
+function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+var
+  LCellData: TCellDataModel;
 begin
-  Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
+  LCellData := QueryHandler.PopulateCellModel(ACellId);
+  try
+//    Result := PredictiveAlgorithm.CalculateMaintenanceDate(LCellData);
+    Result := TList<TResultModel>.Create;
+  finally
+    LCellData.Free;
+  end;
 end;
 
-function TPredictiveMaintenance.GetCellModel(
-  ACellId: integer): TCellDataModel;
+function TPredictiveMaintenance.GetMaintenanceDates(
+  ACellIDs: TList<integer>): TList<TResultModel>;
+var
+  LCellID: integer;
 begin
-  Result := QueryHandler.PopulateCellModel(ACellId);
+  Result := TList<TResultModel>.Create;
+  for LCellID in ACellIDs do
+  begin
+    Result.AddRange(GetMaintenanceDate(LCellID));
+  end;
+end;
+
+function TPredictiveMaintenance.GetCellsList: TList<integer>;
+begin
+  Result := QueryHandler.GetCellsList;
+end;
+
+destructor TPredictiveMaintenance.Destroy;
+begin
+  if Assigned(FPredictiveAlgorithm) then
+    FPredictiveAlgorithm.Free;
+  if Assigned(FQueryHandler) then
+    FQueryHandler.Free;
+  inherited;
 end;
 
 function TPredictiveMaintenance.GetPredictiveAlgorithm: TPredictiveAlgorithm;
@@ -59,6 +89,11 @@ begin
   if not Assigned(FQueryHandler) then
     FQueryHandler := TQueryHandler.Create;
   Result:= FQueryHandler;
+end;
+
+procedure TPredictiveMaintenance.UsePastData(AFlag: boolean);
+begin
+  PredictiveAlgorithm.UsePastData := AFlag;
 end;
 
 end.

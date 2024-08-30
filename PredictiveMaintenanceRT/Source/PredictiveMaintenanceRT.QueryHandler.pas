@@ -66,20 +66,8 @@ begin
 end;
 
 function TQueryHandler.GetCellsList: TList<integer>;
-var
-  LQuery: TADOQuery;
 begin
-  LQuery := TADOQuery.Create(nil);
-  try
-    LQuery := QueryExecutor.ExecuteQuery(QUERY_CELLS);
-    if LQuery <> nil then
-      Result := QueryUtilityHandler.QueryToCellsList(LQuery)
-    else
-      raise Exception.Create(SQL_DATA_NOTFOUND);
-  finally
-    LQuery.Free;
-  end;
-
+  Result := PopulateCell<integer>(QUERY_CELLS, QueryUtilityHandler.QueryToCellsList);
 end;
 
 function TQueryHandler.GetClosedPeriods(
@@ -167,7 +155,6 @@ var
   I: Integer;
 begin
   Result := TList<TProductionOrderModel>.Create;
-  LProductionOrder := TProductionOrderModel.Create;
   try
     try
       for LPhase in APhases do
@@ -175,6 +162,7 @@ begin
         if LPhase.POID <> LProductionOrder.POID then
         begin
           LProductionOrder := TProductionOrderModel.Create;
+          LProductionOrder.Phases := TList<TPhaseModel>.Create;
           LProductionOrder.POID := LPhase.POID;
           Result.Add(LProductionOrder);
         end;
@@ -185,13 +173,9 @@ begin
       raise Exception.Create(PO_ERROR);
     end;
   finally
-
-//    for I := 0 to APhases.Count - 1 do
-//      APhases[I].Free;
-
-    LPhase.Free;
+    for I := 0 to APhases.Count-1 do
+      APhases[I].FreeInstance;
     APhases.Free;
-    LProductionOrder.Free;
   end;
 end;
 
@@ -200,7 +184,6 @@ function TQueryHandler.PopulateCell<T>(const AQuery: string;
 var
   LQuery: TADOQuery;
 begin
-  LQuery := TADOQuery.Create(nil);
   try
     LQuery := QueryExecutor.ExecuteQuery(AQuery);
     if LQuery <> nil then
