@@ -28,7 +28,6 @@ resourcestring
   ACTUALLY_USED_PAST_DATA = 'PastData actually used for PO n°';
   MAN_STRA = 'Data ultima manutenzione = 0';
   CELL_DATA_NIL = 'Cella Data Nil';
-  MAINTENANCE_TODO_MSG = 'Data di manutenzione precedente alla data di oggi, la manutenzione deve essere fatta il prima possibile!';
 
 implementation
 

@@ -3,7 +3,7 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   Top = 0
   Caption = 'Predictive Maintenance'
   ClientHeight = 456
-  ClientWidth = 824
+  ClientWidth = 654
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -71,7 +71,7 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   object lvMaintenanceDates: TListView
     Left = 168
     Top = 40
-    Width = 609
+    Width = 465
     Height = 157
     Columns = <
       item
@@ -88,7 +88,6 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
       item
         Caption = 'Calc %'
       end>
-    RowSelect = True
     TabOrder = 3
     ViewStyle = vsReport
     OnSelectItem = lvMaintenanceDatesSelectItem
@@ -96,7 +95,7 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   object lbWarningList: TListBox
     Left = 168
     Top = 227
-    Width = 609
+    Width = 465
     Height = 153
     ItemHeight = 13
     TabOrder = 4

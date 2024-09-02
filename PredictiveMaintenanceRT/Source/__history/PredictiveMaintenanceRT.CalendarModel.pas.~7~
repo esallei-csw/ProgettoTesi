@@ -33,6 +33,8 @@ implementation
 { TCalendarModel }
 
 constructor TCalendarModel.Create;
+var
+  I: integer;
 begin
   FIDCelPro := varEmpty;
   FIDCalendar := varEmpty;

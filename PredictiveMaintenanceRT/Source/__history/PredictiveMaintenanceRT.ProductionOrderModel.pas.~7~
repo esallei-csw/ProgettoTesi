@@ -38,7 +38,12 @@ begin
 end;
 
 destructor TProductionOrderModel.Destroy;
+var
+  I: Integer;
 begin
+//  for I := 0 to FPhases.Count - 1 do
+//    FPhases[I].FreeInstance;
+  FPhases.Clear;
   FPhases.Free;
   inherited;
 end;

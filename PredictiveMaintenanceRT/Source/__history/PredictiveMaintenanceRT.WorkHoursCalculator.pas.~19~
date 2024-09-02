@@ -4,7 +4,7 @@ interface
 
 uses
   System.SysUtils, System.DateUtils, System.Generics.Collections, PredictiveMaintenanceRT.QueryHandler,
-  PredictiveMaintenanceRT.ClosedPeriodModel, PredictiveMaintenanceRT.CalendarDayModel,
+  PredictiveMaintenanceRT.ClosedPeriodModel,
   PredictiveMaintenanceRT.CalendarModel;
 
 
@@ -14,13 +14,10 @@ type
     FIDCell: integer;
     FHolidayList: TList<Double>;
     FQueryHandler: TQueryHandler;
-    FClosedPeriods: TList<TClosedPeriodModel>;
-    FDayCalendar: TList<TCalendarDayModel>;
     FCalendar: TList<TCalendarModel>;
-//    FDaysOfWeek: TList<Double>;
     function IsHoliday(const ADate: Double): Boolean;
     procedure AddClosedPeriods;
-    procedure InitializeCalendar;
+    function GetCalendarWeek(ADate: Double): Double;
 
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read GetQueryHandler write FQueryHandler;
@@ -40,28 +37,41 @@ begin
   FIDCell := ACellId;
   FHolidayList := TList<Double>.Create;
   AddClosedPeriods;
-  InitializeCalendar;
+  FCalendar := QueryHandler.GetCalendarData(FIDCell);
 end;
 destructor TWorkHoursCalculator.Destroy;
+var
+  I: Integer;
 begin
   FHolidayList.Free;
+  if Assigned(FQueryHandler) then
+    FQueryHandler.Free;
+  for I := 0 to FCalendar.Count-1 do
+    FCalendar[I].Free;
+  FCalendar.Free;
+
   inherited;
 end;
 procedure TWorkHoursCalculator.AddClosedPeriods;
 var
   LClosedPeriod: TClosedPeriodModel;
+  LClosedPeriods: TList<TClosedPeriodModel>;
   LCPDay: Double;
 begin
-  FClosedPeriods := QueryHandler.GetClosedPeriods(FIDCell);
-
-  for LClosedPeriod in FClosedPeriods do
-  begin
-    LCPDay := LClosedPeriod.DataInizio;
-    while LCPDay <> LClosedPeriod.DataFine do
+  LClosedPeriods := QueryHandler.GetClosedPeriods(FIDCell);
+  try
+    for LClosedPeriod in LClosedPeriods do
     begin
-      AddHoliday(LCPDay);
-      LCPDay := LCPDay + 1;
+      LCPDay := LClosedPeriod.DataInizio;
+      while LCPDay <> LClosedPeriod.DataFine do
+      begin
+        AddHoliday(LCPDay);
+        LCPDay := LCPDay + 1;
+      end;
     end;
+  finally
+    LClosedPeriod.Free;
+    LClosedPeriods.Free;
   end;
 end;
 
@@ -69,39 +79,33 @@ procedure TWorkHoursCalculator.AddHoliday(const AHoliday: Double);
 begin
   FHolidayList.Add(AHoliday);
 end;
-procedure TWorkHoursCalculator.InitializeCalendar;
-var
-  LDay: TCalendarDayModel;
-  I: integer;
-begin
-  LDay := TCalendarDayModel.Create;
-  FDayCalendar := QueryHandler.GetCalendarData(FIDCell);
-
-  I := 0;
-  FCalendar := TList<TCalendarModel>.Create;
-  FCalendar.Add(nil);
-  for LDay in FDayCalendar do
-  begin
-    if FCalendar[I].IDCalendar <> LDay.IDCalendar then
-    begin
-      I := I + 1;
-      FCalendar[I].IDCelPro := LDay.IDCell;
-      FCalendar[I].IDCalendar := LDay.IDCalendar;
-      FCalendar[I].DayOfWeek[LDay.Day] := LDay.TotOre;
-      FCalendar[I].StartDay := LDay.StartDay;
-    end
-    else
-    begin
-      FCalendar[I].DayOfWeek[LDay.Day] := LDay.TotOre;
-    end;
-
-  end;
-
-end;
 
 function TWorkHoursCalculator.IsHoliday(const ADate: Double): Boolean;
 begin
   Result := FHolidayList.Contains(ADate);
+end;
+
+function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): Double;
+var
+  LCalendar: TCalendarModel;
+  LResCalendar: TCalendarModel;
+begin
+
+  LResCalendar := nil;
+  //select correct calendar for ADate
+  for LCalendar in FCalendar do
+  begin
+    if (LCalendar.StartDay <= ADate) and ( ( LResCalendar = nil ) or (LCalendar.StartDay > LResCalendar.StartDay ) )then
+      LResCalendar := LCalendar
+    else if ( LCalendar.StartDay > ADate ) then
+      Break;
+  end;
+
+  LResCalendar.HourDaily.TryGetValue(
+    DayOfTheWeek(ADate)
+    , Result
+  );
+
 end;
 
 function TWorkHoursCalculator.GetQueryHandler: TQueryHandler;
@@ -112,15 +116,10 @@ begin
 end;
 
 function TWorkHoursCalculator.GetWorkHours(ADate: Double): Double;
-var
-  LDayOfWeek: Integer;
 begin
   if IsHoliday(ADate) then
     Exit(0);
 
-  // Determine the day of the week
-  LDayOfWeek := DayOfTheWeek(ADate);
-
-//  Result := FDaysOfWeek[LDayOfWeek];
+  Result := GetCalendarWeek(ADate);
 end;
 end.

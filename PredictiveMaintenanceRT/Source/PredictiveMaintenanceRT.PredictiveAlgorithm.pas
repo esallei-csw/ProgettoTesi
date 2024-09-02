@@ -28,7 +28,6 @@ type
     function CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
 
     //Threshold functions
-    function GetDaysToMaintenance(AMaintenanceData: TMaintenanceModel): Double;
     function GetPiecesToMaintenance(APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
     function GetTimeToMaintenance(APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
 
@@ -217,6 +216,8 @@ begin
         Result.Add(CalcDateDays(LIndex, ACell));
       Result[LIndex].Description := LMaintenanceData.Description;
       Result[LIndex].CellID := FIDCell;
+      if Result[LIndex].MaintenanceDate < now then
+        Result[LIndex].WarningList.Add(MAINTENANCE_TODO_MSG);
     end;
     LIndex := LIndex + 1;
   end;
@@ -278,23 +279,6 @@ begin
 
   //calcolo i pezzi che mancano fino alla prossima manutenzione
   Result := AMaintenanceData.ThresholdPieces - LTotalPiecesMade;
-end;
-
-function TPredictiveAlgorithm.GetDaysToMaintenance(
-  AMaintenanceData: TMaintenanceModel): Double;
-var
-  LTimeFromLastMaintenance: Double;
-  LThresholdDays: Double;
-begin
-  //questa funzione deve ritornare la data calcolandola in base alle soglie di tempo(Giorni e mesi)
-  //Calcolare prima di tutto il tempo passato dall ultima manutenzione
-  LTimeFromLastMaintenance := now - AMaintenanceData.LastMaintenance;
-
-  //convertire i mesi e giorni in giorni
-  LThresholdDays := AMaintenanceData.ThresholdDays + (AMaintenanceData.ThresholdMonths * DAYS_IN_A_MONTH);
-
-  //sottrarre dal tempo soglia il tempo dall ultima manutenzione
-  Result := LThresholdDays - LTimeFromLastMaintenance;
 end;
 
 function TPredictiveAlgorithm.GetMedianHoursPerPiece(

@@ -97,7 +97,6 @@ begin
   //initialize result list
   Result := TDictionary<integer, double>.Create;
 
-
   LQrySel := QueryExecutor.ExecuteQuery(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]));
   try
     try
@@ -116,8 +115,6 @@ begin
         raise;
       end;
     end;
-
-    // Result := PopulateCell<Double>(Format(QUERY_WEEK_CALENDAR, [IntToStr(ACalendarId)]), QueryUtilityHandler.QueryToWeekCalendar);
   finally
     LQrySel.Free;
   end;
