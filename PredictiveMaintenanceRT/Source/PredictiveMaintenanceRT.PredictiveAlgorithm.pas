@@ -21,6 +21,7 @@ type
     function GetMedianHoursPerPiece(APartials: TList<TPartialModel>; AIDArtico: integer): Double;
     function GetMedianDailyMachineStops(AMachineStops: TList<TMachineStopModel>): Double;
     function CalcMaintenancePT(AMaintenanceData: TMaintenanceModel; Acell: TCellDataModel): TResultModel;
+    function GetDailyWorkHours(ADate: Double; AMachineStops: TList<TMachineStopModel>): Double;
 
     //Calc Date functions
     function CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
@@ -70,9 +71,8 @@ begin
   while true do
   begin
     //Daily Work Hours Calc
-    LRealWorkHours := WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
-    if LRealWorkHours > 0 then
-      LRealWorkHours := LRealWorkHours - GetMedianDailyMachineStops(ACell.MachineStops);
+    LRealWorkHours := GetDailyWorkHours(Result.MaintenanceDate, ACell.MachineStops);
+
     AThreshold := AThreshold - LRealWorkHours;
     LWorkHours := LWorkHours - LRealWorkHours;
     LCountPerc := LCountPerc + LRealWorkHours;
@@ -155,9 +155,7 @@ begin
     else
       LPiecesAnHour := LProductionOrderList[LPOIter].Phases[0].Quantity / LWorkHours;
     //Daily Work Hours Calc
-    LRealWorkHours := WorkHoursCalculator.GetWorkHours(Result.MaintenanceDate);
-    if LRealWorkHours > 0 then
-      LRealWorkHours := LRealWorkHours - GetMedianDailyMachineStops(ACell.MachineStops);
+    LRealWorkHours := GetDailyWorkHours(Result.MaintenanceDate, ACell.MachineStops);
 
     LPiecesADay := LRealWorkHours * LPiecesAnHour;
     AThreshold := AThreshold - LPiecesADay;
@@ -179,7 +177,6 @@ begin
       end;
       LPOIter := LPOIter + 1;
       LQuantity := LProductionOrderList[LPOIter].Phases[0].Quantity;
-
     end;
     Result.MaintenanceDate := Result.MaintenanceDate + 1;
   end;
@@ -305,6 +302,14 @@ begin
     Result := 0
   else
     Result := Result / LCount;
+end;
+
+function TPredictiveAlgorithm.GetDailyWorkHours(ADate: Double;
+  AMachineStops: TList<TMachineStopModel>): Double;
+begin
+  Result := WorkHoursCalculator.GetWorkHours(ADate);
+  if Result > 0 then
+      Result := Result - GetMedianDailyMachineStops(AMachineStops);
 end;
 
 function TPredictiveAlgorithm.GetMedianDailyMachineStops(

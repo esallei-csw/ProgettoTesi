@@ -13,7 +13,7 @@ type
   FIDCelPro: integer;
   FIDCalendar: integer;
   FStartDay: Double;
-  FHourDaily: TDictionary<integer, double>;
+    FHourDaily: TDictionary<integer, double>;
 
 
   public

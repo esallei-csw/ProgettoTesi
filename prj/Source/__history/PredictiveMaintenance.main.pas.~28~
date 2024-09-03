@@ -18,17 +18,25 @@ type
     lvMaintenanceDates: TListView;
     lbWarningList: TListBox;
     lblWarningList: TLabel;
+    lbCellsList: TListBox;
+    lblCells: TLabel;
+    btnGetCellsList: TButton;
+    btnGetMaintenanceDates: TButton;
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
     procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem;
       Selected: Boolean);
+    procedure btnGetCellsListClick(Sender: TObject);
+    procedure btnGetMaintenanceDatesClick(
+  Sender: TObject);
   private
     { Private declarations }
     FResultList: TList<TResultModel>;
     FPredictiveMaintenance: TPredictiveMaintenance;
 
-
+    procedure FreeResultList;
+    procedure UpdateMDList;
     function GetPredictiveMaintenance: TPredictiveMaintenance;
     property PredictiveMaintenance: TPredictiveMaintenance read GetPredictiveMaintenance write FPredictiveMaintenance;
   public
@@ -45,28 +53,62 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages;
 
-procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
+procedure TfrmPredictiveMaintenance.btnGetCellsListClick(Sender: TObject);
 var
-  LListItem: TListItem;
-  LResultItem: TResultModel;
+  LCellId: integer;
+  LCellsList: TList<integer>;
 begin
+  try
+    lbCellsList.Items.Clear;
+    LCellsList := PredictiveMaintenance.GetCellsList;
+    for LCellId in LCellsList do
+      lbCellsList.Items.Add(IntToStr(LCellId));
+  finally
+    LCellsList.Free;
+  end;
+end;
+
+procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
+begin
+  PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
+
+  FreeResultList;
+
   FResultList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
 
-  lvMaintenanceDates.Items.BeginUpdate;
+  UpdateMDList;
+end;
 
+procedure TfrmPredictiveMaintenance.btnGetMaintenanceDatesClick(
+  Sender: TObject);
+var
+  LCellID: integer;
+  LCellsID: TList<integer>;
+  LResultList: TList<TResultModel>;
+  LResult: TResultModel;
+begin
+  PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
+
+  FreeResultList;
+
+  FResultList := TList<TResultModel>.Create;
+  LCellsID := PredictiveMaintenance.GetCellsList;
   try
-    lvMaintenanceDates.Items.Clear;
-    for LResultItem in FResultList do
+    for LCellID in LCellsID do
     begin
-      LListItem := lvMaintenanceDates.Items.Add;
-      LListItem.Caption := LResultItem.Description;
-      LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
-      LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
-      LListItem.SubItems.Add(LResultItem.WarningList.ToString);
+      try
+        LResultList := PredictiveMaintenance.GetMaintenanceDate(LCellID);
+        for LResult in LResultList do
+          FResultList.Add(LResult);
+      finally
+        LResultList.Free;
+      end;
     end;
   finally
-      lvMaintenanceDates.Items.EndUpdate;
-    end;
+    LCellsID.Free;
+  end;
+
+  UpdateMDList;
 end;
 
 procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);
@@ -79,6 +121,20 @@ procedure TfrmPredictiveMaintenance.FormDestroy(Sender: TObject);
 begin
   if Assigned(FPredictiveMaintenance) then
     FPredictiveMaintenance.Free;
+  FreeResultList;
+  inherited;
+end;
+
+procedure TfrmPredictiveMaintenance.FreeResultList;
+var
+  I: Integer;
+begin
+  if Assigned(FResultList) then
+  begin
+    for I := 0 to FResultList.Count-1 do
+      FResultList[I].Free;
+    FResultList.Free;
+  end;
 end;
 
 function TfrmPredictiveMaintenance.GetPredictiveMaintenance: TPredictiveMaintenance;
@@ -87,6 +143,7 @@ begin
     FPredictiveMaintenance := TPredictiveMaintenance.Create;
   Result := FPredictiveMaintenance;
 end;
+
 procedure TfrmPredictiveMaintenance.lvMaintenanceDatesSelectItem(
   Sender: TObject; Item: TListItem; Selected: Boolean);
 var
@@ -98,4 +155,24 @@ begin
     lbWarningList.Items.Add(LWarningString);
 end;
 
+procedure TfrmPredictiveMaintenance.UpdateMDList;
+var
+  LListItem: TListItem;
+  LResultItem: TResultModel;
+begin
+  lvMaintenanceDates.Items.BeginUpdate;
+  try
+    lvMaintenanceDates.Items.Clear;
+    for LResultItem in FResultList do
+    begin
+      LListItem := lvMaintenanceDates.Items.Add;
+      LListItem.Caption := IntToStr(LResultItem.CellID);
+      LListItem.SubItems.Add(LResultItem.Description);
+      LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
+      LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
+    end;
+  finally
+    lvMaintenanceDates.Items.EndUpdate;
+  end;
+end;
 end.

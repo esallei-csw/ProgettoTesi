@@ -3,7 +3,9 @@ unit PredictiveMaintenanceRT.CellDataModel;
 interface
 
 uses
-  PredictiveMaintenanceRT.PartialModel, System.Generics.Collections, PredictiveMaintenanceRT.MaintenanceModel, PredictiveMaintenanceRT.ProductionOrderModel;
+  PredictiveMaintenanceRT.PartialModel, System.Generics.Collections, PredictiveMaintenanceRT.MaintenanceModel,
+  PredictiveMaintenanceRT.ProductionOrderModel,
+  PredictiveMaintenanceRT.MachineStopModel;
 
 type
   TCellDataModel = class
@@ -11,9 +13,9 @@ type
     {Private declarations}
     FCellId: integer;
     FMaintenanceData: TList<TMaintenanceModel>;
-    FPartials: TList<TPartialModel>;
     FProductionOrders: TList<TProductionOrderModel>;
     FTotalPartials: TList<TPartialModel>;
+    FMachineStops: TList<TMachineStopModel>;
 
 
     public
@@ -21,14 +23,10 @@ type
     constructor Create;
     destructor Destroy; override;
     property CellId: integer read FCellId write FCellId;
-
     property MaintenanceData: TList<TMaintenanceModel> read FMaintenanceData write FMaintenanceData;
-
-    property Partials: TList<TPartialModel> read FPartials write FPartials;
-
     property ProductionOrders: TList<TProductionOrderModel> read FProductionOrders write FProductionOrders;
-
     property TotalPartials: TList<TPartialModel> read FTotalPartials write FTotalPartials;
+    property MachineStops: TList<TMachineStopModel> read FMachineStops write FMachineStops;
 
 
   end;
@@ -40,18 +38,28 @@ implementation
 constructor TCellDataModel.Create;
 begin
   FCellId := varEmpty;
-  FMaintenanceData := TList<TMaintenanceModel>.Create;
-  FPartials := TList<TPartialModel>.Create;
-  FProductionOrders := TList<TProductionOrderModel>.Create;
-  FTotalPartials := TList<TPartialModel>.Create;
+  FMaintenanceData := nil;
+  FProductionOrders := nil;
+  FTotalPartials := nil;
+  FMachineStops := nil;
 end;
 
 destructor TCellDataModel.Destroy;
+var
+  I: integer;
 begin
+  for I := 0 to FMaintenanceData.Count - 1 do
+    FMaintenanceData.Items[I].Free;
   FMaintenanceData.Free;
-  FPartials.Free;
-  FProductionOrders.Free;
+  for I := 0 to FTotalPartials.Count - 1 do
+    FTotalPartials.Items[I].Free;
   FTotalPartials.Free;
+  for I := 0 to FProductionOrders.Count - 1 do
+    FProductionOrders.Items[I].Free;
+  FProductionOrders.Free;
+  for I := 0 to FMachineStops.Count - 1 do
+    FMachineStops.Items[I].Free;
+  FMachineStops.Free;
   inherited;
 end;
 

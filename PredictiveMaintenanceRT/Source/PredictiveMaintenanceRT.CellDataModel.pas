@@ -5,6 +5,7 @@ interface
 uses
   PredictiveMaintenanceRT.PartialModel, System.Generics.Collections, PredictiveMaintenanceRT.MaintenanceModel,
   PredictiveMaintenanceRT.ProductionOrderModel,
+
   PredictiveMaintenanceRT.MachineStopModel;
 
 type
@@ -46,19 +47,22 @@ end;
 
 destructor TCellDataModel.Destroy;
 var
-  I: integer;
+  LMaintenanceData: TMaintenanceModel;
+  LTotalPartial: TPartialModel;
+  LProductionOrder: TProductionOrderModel;
+  LMachineStop: TMachineStopModel;
 begin
-  for I := 0 to FMaintenanceData.Count - 1 do
-    FMaintenanceData.Items[I].Free;
+  for LMaintenanceData in FMaintenanceData do
+    LMaintenanceData.Free;
   FMaintenanceData.Free;
-  for I := 0 to FTotalPartials.Count - 1 do
-    FTotalPartials.Items[I].Free;
+  for LTotalPartial in FTotalPartials do
+    LTotalPartial.Free;
   FTotalPartials.Free;
-  for I := 0 to FProductionOrders.Count - 1 do
-    FProductionOrders.Items[I].Free;
+  for LProductionOrder in FProductionOrders do
+    LProductionOrder.Free;
   FProductionOrders.Free;
-  for I := 0 to FMachineStops.Count - 1 do
-    FMachineStops.Items[I].Free;
+  for LMachineStop in FMachineStops do
+    LMachineStop.Free;
   FMachineStops.Free;
   inherited;
 end;

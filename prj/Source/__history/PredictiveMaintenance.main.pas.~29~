@@ -25,9 +25,11 @@ type
     procedure btnGetMaintenanceDateClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
-    procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem;
+      Selected: Boolean);
     procedure btnGetCellsListClick(Sender: TObject);
-    procedure btnGetMaintenanceDatesClick(Sender: TObject);
+    procedure btnGetMaintenanceDatesClick(
+  Sender: TObject);
   private
     { Private declarations }
     FResultList: TList<TResultModel>;
@@ -105,6 +107,7 @@ begin
   finally
     LCellsID.Free;
   end;
+
   UpdateMDList;
 end;
 
@@ -124,12 +127,12 @@ end;
 
 procedure TfrmPredictiveMaintenance.FreeResultList;
 var
-  LResult: TResultModel;
+  I: Integer;
 begin
   if Assigned(FResultList) then
   begin
-    for LResult in FResultList do
-      LResult.Free;
+    for I := 0 to FResultList.Count-1 do
+      FResultList[I].Free;
     FResultList.Free;
   end;
 end;
