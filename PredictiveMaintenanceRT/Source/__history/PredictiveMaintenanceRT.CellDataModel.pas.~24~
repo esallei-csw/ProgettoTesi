@@ -4,7 +4,8 @@ interface
 
 uses
   PredictiveMaintenanceRT.PartialModel, System.Generics.Collections, PredictiveMaintenanceRT.MaintenanceModel,
-  PredictiveMaintenanceRT.ProductionOrderModel, PredictiveMaintenanceRT.ClosedPeriodModel,
+  PredictiveMaintenanceRT.ProductionOrderModel,
+
   PredictiveMaintenanceRT.MachineStopModel;
 
 type
@@ -13,10 +14,8 @@ type
     {Private declarations}
     FCellId: integer;
     FMaintenanceData: TList<TMaintenanceModel>;
-    //FPartials: TList<TPartialModel>;
     FProductionOrders: TList<TProductionOrderModel>;
     FTotalPartials: TList<TPartialModel>;
-    FClosedPeriods: TList<TClosedPeriodModel>;
     FMachineStops: TList<TMachineStopModel>;
 
 
@@ -26,10 +25,8 @@ type
     destructor Destroy; override;
     property CellId: integer read FCellId write FCellId;
     property MaintenanceData: TList<TMaintenanceModel> read FMaintenanceData write FMaintenanceData;
-    //property Partials: TList<TPartialModel> read FPartials write FPartials;
     property ProductionOrders: TList<TProductionOrderModel> read FProductionOrders write FProductionOrders;
     property TotalPartials: TList<TPartialModel> read FTotalPartials write FTotalPartials;
-    property ClosedPeriods: TList<TClosedPeriodModel> read FClosedPeriods write FClosedPeriods;
     property MachineStops: TList<TMachineStopModel> read FMachineStops write FMachineStops;
 
 
@@ -42,21 +39,30 @@ implementation
 constructor TCellDataModel.Create;
 begin
   FCellId := varEmpty;
-  FMaintenanceData := TList<TMaintenanceModel>.Create;
-  //FPartials := TList<TPartialModel>.Create;
-  FProductionOrders := TList<TProductionOrderModel>.Create;
-  FTotalPartials := TList<TPartialModel>.Create;
-  FClosedPeriods := TList<TClosedPeriodModel>.Create;
-  FMachineStops := TList<TMachineStopModel>.Create;
+  FMaintenanceData := nil;
+  FProductionOrders := nil;
+  FTotalPartials := nil;
+  FMachineStops := nil;
 end;
 
 destructor TCellDataModel.Destroy;
+var
+  LMaintenanceData: TMaintenanceModel;
+  LTotalPartial: TPartialModel;
+  LProductionOrder: TProductionOrderModel;
+  LMachineStop: TMachineStopModel;
 begin
+  for LMaintenanceData in FMaintenanceData do
+    LMaintenanceData.Free;
   FMaintenanceData.Free;
-  //FPartials.Free;
-  FProductionOrders.Free;
+  for LTotalPartial in FTotalPartials do
+    LTotalPartial.Free;
   FTotalPartials.Free;
-  FClosedPeriods.Free;
+  for LProductionOrder in FProductionOrders do
+    LProductionOrder.Free;
+  FProductionOrders.Free;
+  for LMachineStop in FMachineStops do
+    LMachineStop.Free;
   FMachineStops.Free;
   inherited;
 end;

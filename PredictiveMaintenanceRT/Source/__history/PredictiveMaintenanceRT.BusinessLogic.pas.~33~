@@ -22,11 +22,12 @@ type
     function GetQueryHandler: TQueryHandler;
     property QueryHandler: TQueryHandler read getQueryHandler write FQueryHandler;
 
-
-    function GetCellModel(ACellId: integer): TCellDataModel;
   public
     {Public declarations}
+    destructor Destroy; override;
     function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+    procedure UsePastData(AFlag: boolean);
+    function GetCellsList: TList<integer>;
 
   end;
 
@@ -37,14 +38,29 @@ uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
 function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+var
+  LCellData: TCellDataModel;
 begin
-  Result := PredictiveAlgorithm.CalculateMaintenanceDate(GetCellModel(ACellId));
+  LCellData := QueryHandler.PopulateCellModel(ACellId);
+  try
+    Result := PredictiveAlgorithm.CalculateMaintenanceDate(LCellData);
+  finally
+    LCellData.Free;
+  end;
 end;
 
-function TPredictiveMaintenance.GetCellModel(
-  ACellId: integer): TCellDataModel;
+function TPredictiveMaintenance.GetCellsList: TList<integer>;
 begin
-  Result := QueryHandler.PopulateCellModel(ACellId);
+  Result := QueryHandler.GetCellsList;
+end;
+
+destructor TPredictiveMaintenance.Destroy;
+begin
+  if Assigned(FPredictiveAlgorithm) then
+    FPredictiveAlgorithm.Free;
+  if Assigned(FQueryHandler) then
+    FQueryHandler.Free;
+  inherited;
 end;
 
 function TPredictiveMaintenance.GetPredictiveAlgorithm: TPredictiveAlgorithm;
@@ -59,6 +75,11 @@ begin
   if not Assigned(FQueryHandler) then
     FQueryHandler := TQueryHandler.Create;
   Result:= FQueryHandler;
+end;
+
+procedure TPredictiveMaintenance.UsePastData(AFlag: boolean);
+begin
+  PredictiveAlgorithm.UsePastData := AFlag;
 end;
 
 end.

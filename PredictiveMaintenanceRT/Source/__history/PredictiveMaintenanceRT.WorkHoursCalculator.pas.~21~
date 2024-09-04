@@ -40,11 +40,14 @@ begin
   FCalendar := QueryHandler.GetCalendarData(FIDCell);
 end;
 destructor TWorkHoursCalculator.Destroy;
+var
+  I: Integer;
 begin
   FHolidayList.Free;
   if Assigned(FQueryHandler) then
     FQueryHandler.Free;
-
+  for I := 0 to FCalendar.Count-1 do
+    FCalendar[I].Free;
   FCalendar.Free;
 
   inherited;
@@ -67,6 +70,7 @@ begin
       end;
     end;
   finally
+    LClosedPeriod.Free;
     LClosedPeriods.Free;
   end;
 end;

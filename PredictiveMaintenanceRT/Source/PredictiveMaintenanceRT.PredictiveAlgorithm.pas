@@ -18,10 +18,10 @@ type
     FWorkHoursCalculator: TWorkHoursCalculator;
 
     //Utility functions
-    function GetMedianHoursPerPiece(APartials: TList<TPartialModel>; AIDArtico: integer): Double;
-    function GetMedianDailyMachineStops(AMachineStops: TList<TMachineStopModel>): Double;
+    function GetMedianHoursPerPiece(APartials: TObjectList<TPartialModel>; AIDArtico: integer): Double;
+    function GetMedianDailyMachineStops(AMachineStops: TObjectList<TMachineStopModel>): Double;
     function CalcMaintenancePT(AMaintenanceData: TMaintenanceModel; Acell: TCellDataModel): TResultModel;
-    function GetDailyWorkHours(ADate: Double; AMachineStops: TList<TMachineStopModel>): Double;
+    function GetDailyWorkHours(ADate: Double; AMachineStops: TObjectList<TMachineStopModel>): Double;
 
     //Calc Date functions
     function CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
@@ -29,8 +29,8 @@ type
     function CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
 
     //Threshold functions
-    function GetPiecesToMaintenance(APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
-    function GetTimeToMaintenance(APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
+    function GetPiecesToMaintenance(APartials: TObjectList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
+    function GetTimeToMaintenance(APartials: TObjectList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
 
     function GetWorkHoursCalculator: TWorkHoursCalculator;
     property WorkHoursCalculator: TWorkHoursCalculator read GetWorkHoursCalculator write FWorkHoursCalculator;
@@ -39,7 +39,7 @@ type
   {Public declarations}
     constructor Create;
     destructor Destroy; override;
-    function CalculateMaintenanceDate(ACell: TCellDataModel): TList<TResultModel>;
+    function CalculateMaintenanceDate(ACell: TCellDataModel): TObjectList<TResultModel>;
     property UsePastData: boolean read FUsePastData write FUsePastData;
   end;
 
@@ -53,7 +53,7 @@ uses
 function TPredictiveAlgorithm.CalcDateTime(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
 var
   LPOIter: integer;
-  LProductionOrderList: TList<TProductionOrderModel>;
+  LProductionOrderList: TObjectList<TProductionOrderModel>;
   LWorkHours: Double;
   LTotPerc: Double;
   LCountPerc: Double;
@@ -81,15 +81,16 @@ begin
     if AThreshold <= 0 then
     begin
       Result.Percent := (LCountPerc * 100) / LTotPerc;
-      exit;
+      Break;
     end;
+
     if LWorkHours <= 0 then
     begin
       if LPOIter = LProductionOrderList.Count - 1 then
       begin
         Result.WarningList.Add(NOT_ENOUGH_PO);
         Result.Percent := (100 * LCountPerc) / LTotPerc;
-        exit;
+        Break;
       end;
       LPOIter := LPOIter + 1;
       LWorkHours := LProductionOrderList[LPOIter].WorkHours;
@@ -100,6 +101,7 @@ begin
 
     Result.MaintenanceDate := Result.MaintenanceDate + 1;
   end;
+
 end;
 
 function TPredictiveAlgorithm.CalcDateDays(AIndex: integer; ACell: TCellDataModel): TResultModel;
@@ -116,7 +118,7 @@ end;
 function TPredictiveAlgorithm.CalcDatePieces(AThreshold, ATotalThreshold: Double; ACell: TCellDataModel): TResultModel;
 var
   LPOIter: integer;
-  LProductionOrderList: TList<TProductionOrderModel>;
+  LProductionOrderList: TObjectList<TProductionOrderModel>;
   LPiecesADay: Double;
   LPiecesAnHour: Double;
   LQuantity: Double;
@@ -131,8 +133,6 @@ begin
   LProductionOrderList := ACell.ProductionOrders;
   LTotPerc := ATotalThreshold;
   LCountPerc := ATotalThreshold - AThreshold;
-  LPiecesADay := 0;
-  LPiecesAnHour := 0;
 
   Result.WarningList.Add(PIECES_CALC);
   Lquantity := LProductionOrderList[LPOIter].Phases[0].Quantity;
@@ -182,7 +182,7 @@ begin
   end;
 end;
 
-function TPredictiveAlgorithm.CalculateMaintenanceDate(ACell: TCellDataModel): TList<TResultModel>;
+function TPredictiveAlgorithm.CalculateMaintenanceDate(ACell: TCellDataModel): TObjectList<TResultModel>;
 var
   LMaintenanceData: TMaintenanceModel;
   LResult: TResultModel;
@@ -191,7 +191,7 @@ begin
   if ACell = nil then
     raise Exception.Create(CELL_DATA_NIL);
   LIndex := 0;
-  Result := TList<TResultModel>.Create;
+  Result := TObjectList<TResultModel>.Create;
   FIDCell := ACell.CellId;
 
   for LMaintenanceData in ACell.MaintenanceData do
@@ -260,7 +260,7 @@ begin
   inherited;
 end;
 
-function TPredictiveAlgorithm.GetPiecesToMaintenance(APartials: TList<TPartialModel>;
+function TPredictiveAlgorithm.GetPiecesToMaintenance(APartials: TObjectList<TPartialModel>;
   AMaintenanceData: TMaintenanceModel): Double;
 var
   LTotalPiecesMade: Double;
@@ -279,7 +279,7 @@ begin
 end;
 
 function TPredictiveAlgorithm.GetMedianHoursPerPiece(
-  APartials: TList<TPartialModel>; AIDArtico: integer): Double;
+  APartials: TObjectList<TPartialModel>; AIDArtico: integer): Double;
 var
   LPartial: TPartialModel;
   LCount: integer;
@@ -305,7 +305,7 @@ begin
 end;
 
 function TPredictiveAlgorithm.GetDailyWorkHours(ADate: Double;
-  AMachineStops: TList<TMachineStopModel>): Double;
+  AMachineStops: TObjectList<TMachineStopModel>): Double;
 begin
   Result := WorkHoursCalculator.GetWorkHours(ADate);
   if Result > 0 then
@@ -313,7 +313,7 @@ begin
 end;
 
 function TPredictiveAlgorithm.GetMedianDailyMachineStops(
-  AMachineStops: TList<TMachineStopModel>): Double;
+  AMachineStops: TObjectList<TMachineStopModel>): Double;
 var
   LMachineStop: TMachineStopModel;
   LDays: Double;
@@ -335,7 +335,7 @@ begin
 end;
 
 function TPredictiveAlgorithm.GetTimeToMaintenance(
-  APartials: TList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
+  APartials: TObjectList<TPartialModel>; AMaintenanceData: TMaintenanceModel): Double;
 var
   LTotalTimeWorked: Double;
   I: Integer;

@@ -78,8 +78,7 @@
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="dbrtl.dcp"/>
+        <DCCReference Include="adortl.dcp"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.BusinessLogic.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.BusinessLogicInterface.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.QueryExecutor.pas"/>
@@ -98,6 +97,7 @@
         <DCCReference Include="Source\PredictiveMaintenanceRT.ClosedPeriodModel.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.MachineStopModel.pas"/>
         <DCCReference Include="Source\PredictiveMaintenanceRT.CalendarModel.pas"/>
+        <DCCReference Include="Source\PredictiveMaintenanceRT.Factory.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

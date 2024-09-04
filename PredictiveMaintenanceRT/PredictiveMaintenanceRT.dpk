@@ -28,8 +28,7 @@ package PredictiveMaintenanceRT;
 {$IMPLICITBUILD ON}
 
 requires
-  rtl,
-  dbrtl;
+  adortl;
 
 contains
   PredictiveMaintenanceRT.BusinessLogic in 'Source\PredictiveMaintenanceRT.BusinessLogic.pas',
@@ -49,9 +48,11 @@ contains
   PredictiveMaintenanceRT.QueryUtilityHandler in 'Source\PredictiveMaintenanceRT.QueryUtilityHandler.pas',
   PredictiveMaintenanceRT.ClosedPeriodModel in 'Source\PredictiveMaintenanceRT.ClosedPeriodModel.pas',
   PredictiveMaintenanceRT.MachineStopModel in 'Source\PredictiveMaintenanceRT.MachineStopModel.pas',
-  PredictiveMaintenanceRT.CalendarModel in 'Source\PredictiveMaintenanceRT.CalendarModel.pas';
+  PredictiveMaintenanceRT.CalendarModel in 'Source\PredictiveMaintenanceRT.CalendarModel.pas',
+  PredictiveMaintenanceRT.Factory in 'Source\PredictiveMaintenanceRT.Factory.pas';
 
 end.
+
 
 
 

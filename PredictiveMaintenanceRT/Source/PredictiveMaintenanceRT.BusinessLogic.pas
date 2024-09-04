@@ -25,7 +25,7 @@ type
   public
     {Public declarations}
     destructor Destroy; override;
-    function GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+    function GetMaintenanceDate(ACellId: integer): TObjectList<TResultModel>;
     procedure UsePastData(AFlag: boolean);
     function GetCellsList: TList<integer>;
 
@@ -37,7 +37,7 @@ implementation
 uses
   PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, System.SysUtils;
 
-function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TList<TResultModel>;
+function TPredictiveMaintenance.GetMaintenanceDate(ACellId: integer): TObjectList<TResultModel>;
 var
   LCellData: TCellDataModel;
 begin
@@ -58,8 +58,10 @@ destructor TPredictiveMaintenance.Destroy;
 begin
   if Assigned(FPredictiveAlgorithm) then
     FPredictiveAlgorithm.Free;
+
   if Assigned(FQueryHandler) then
     FQueryHandler.Free;
+
   inherited;
 end;
 

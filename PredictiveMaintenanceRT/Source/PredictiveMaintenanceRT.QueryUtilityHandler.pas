@@ -17,16 +17,14 @@ type TQueryUtilityHandler = class
   public
   {Public declarations}
 
-    function QueryToPartialsList(AQuery : TADOQuery): TList<TPartialModel>;
-    function QueryToMaintenanceData(AQuery: TADOQuery): TList<TMaintenanceModel>;
-    function QueryToPhaseList(AQuery: TADOQuery): TList<TPhaseModel>;
+    function QueryToPartialsList(AQuery : TADOQuery): TObjectList<TPartialModel>;
+    function QueryToMaintenanceData(AQuery: TADOQuery): TObjectList<TMaintenanceModel>;
+    function QueryToPhaseList(AQuery: TADOQuery): TObjectList<TPhaseModel>;
     function QueryToCellsList(AQuery:TADOQuery): TList<integer>;
-    function QueryToClosedPeriods(AQuery:TADOQuery): TList<TClosedPeriodModel>;
-    function QueryToMachineStops(AQuery:TADOQuery): TList<TMachineStopModel>;
-    function QueryToCalendars(AQuery:TADOQuery): TList<TCalendarModel>;
-//    function QueryToWeekCalendar(AQuery:TADOQuery): TList<Double>;
-
-    procedure WorkHoursSum(AProductionOrders: TList<TProductionOrderModel>);
+    function QueryToClosedPeriods(AQuery:TADOQuery): TObjectList<TClosedPeriodModel>;
+    function QueryToMachineStops(AQuery:TADOQuery): TObjectList<TMachineStopModel>;
+    function QueryToCalendars(AQuery:TADOQuery): TObjectList<TCalendarModel>;
+    procedure WorkHoursSum(AProductionOrders: TObjectList<TProductionOrderModel>);
 end;
 
 implementation
@@ -37,11 +35,11 @@ uses
 { TQueryUtilityHandler }
 
 function TQueryUtilityHandler.QueryToCalendars(
-  AQuery: TADOQuery): TList<TCalendarModel>;
+  AQuery: TADOQuery): TObjectList<TCalendarModel>;
 var
   LDay: TCalendarModel;
 begin
-  Result := TList<TCalendarModel>.Create;
+  Result := TObjectList<TCalendarModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -88,11 +86,11 @@ begin
 end;
 
 function TQueryUtilityHandler.QueryToPartialsList(
-  AQuery: TADOQuery): TList<TPartialModel>;
+  AQuery: TADOQuery): TObjectList<TPartialModel>;
 var
   LPartial: TPartialModel;
 begin
-  Result := TList<TPartialModel>.Create;
+  Result := TObjectList<TPartialModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -118,11 +116,11 @@ begin
 end;
 
 function TQueryUtilityHandler.QueryToClosedPeriods(
-  AQuery: TADOQuery): TList<TClosedPeriodModel>;
+  AQuery: TADOQuery): TObjectList<TClosedPeriodModel>;
 var
   LPeriod: TClosedPeriodModel;
 begin
-  Result := TList<TClosedPeriodModel>.Create;
+  Result := TObjectList<TClosedPeriodModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -148,11 +146,11 @@ begin
 end;
 
 function TQueryUtilityHandler.QueryToMachineStops(
-  AQuery: TADOQuery): TList<TMachineStopModel>;
+  AQuery: TADOQuery): TObjectList<TMachineStopModel>;
 var
   LMachineStop: TMachineStopModel;
 begin
-  Result := TList<TMachineStopModel>.Create;
+  Result := TObjectList<TMachineStopModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -179,11 +177,11 @@ begin
 end;
 
 function TQueryUtilityHandler.QueryToMaintenanceData(
-  AQuery: TADOQuery): TList<TMaintenanceModel>;
+  AQuery: TADOQuery): TObjectList<TMaintenanceModel>;
 var
   LMaintenanceData: TMaintenanceModel;
 begin
-  Result := TList<TMaintenanceModel>.Create;
+  Result := TObjectList<TMaintenanceModel>.Create;
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -209,11 +207,11 @@ begin
 end;
 
 function TQueryUtilityHandler.QueryToPhaseList(
-  AQuery: TADOQuery): TList<TPhaseModel>;
+  AQuery: TADOQuery): TObjectList<TPhaseModel>;
 var
   LPhase: TPhaseModel;
 begin
-  Result := TList<TPhaseModel>.Create;
+  Result := TObjectList<TPhaseModel>.Create();
   try
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
@@ -237,41 +235,16 @@ begin
   end;
 end;
 
-//function TQueryUtilityHandler.QueryToWeekCalendar(
-//  AQuery: TADOQuery): TList<Double>;
-//var
-//  I: Integer;
-//begin
-//  //initialize result list
-//  Result := TList<Double>.Create;
-//  for I := 0 to 7 do
-//  begin
-//    Result.Add(0);
-//  end;
-//
-//  try
-//    if not AQuery.Active then
-//      raise Exception.Create(DATASET_CLOSED);
-//    AQuery.First;
-//    while not AQuery.Eof do
-//    begin
-//      Result[AQuery.FieldByName(GIORNO).AsInteger] := AQuery.FieldByName(CALENDAR_TOTORE).AsFloat;
-//      AQuery.Next;
-//    end;
-//  except
-//    begin
-//      Result.Free;
-//      raise;
-//    end;
-//  end;
-//end;
 
 procedure TQueryUtilityHandler.WorkHoursSum(
-  AProductionOrders: TList<TProductionOrderModel>);
+  AProductionOrders: TObjectList<TProductionOrderModel>);
 var
   LProductionOrder: TProductionOrderModel;
   LPhase: TPhaseModel;
 begin
+  if ( AProductionOrders = nil )  then
+    Exit;
+
   for LProductionOrder in AProductionOrders do
   begin
     for LPhase in LProductionOrder.Phases do

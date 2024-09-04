@@ -12,15 +12,19 @@ type
   TQueryHandler = class
 
 type
-  TFunc<T> = reference to function(Value: TADOQuery): TList<T>;
+  TFunctInt<T> = reference to function(Value: TADOQuery): TList<T>;
+
+  TFunc<T: class> = reference to function(Value: TADOQuery): TObjectList<T>;
   private
   {Private declarations}
     FQueryExecutor: TQueryExecutor;
     FQueryUtilityHandler: TQueryUtilityHandler;
 
-    function PopulateCell<T>(const AQuery: string; AFunc: TFunc<T>): TList<T>; overload;
+    function PopulateCell<T: class>(const AQuery: string; AFunc: TFunc<T>): TObjectList<T>;
 
-    function PopulateProductionOrders(APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
+    function PopulateCellList(const AQuery: string; AFunc: TFunctInt<integer>): TList<integer>;
+
+    function PopulateProductionOrders(APhases: TObjectList<TPhaseModel>): TObjectList<TProductionOrderModel>;
 
     function GetQueryExecutor: TQueryExecutor;
     property QueryExecutor: TQueryExecutor read GetQueryExecutor write FQueryExecutor;
@@ -33,8 +37,8 @@ type
     destructor Destroy; override;
     function PopulateCellModel(ACellId: integer): TCellDataModel;
     function GetCellsList: TList<integer>;
-    function GetClosedPeriods(ACellId: integer): TList<TClosedPeriodModel>;
-    function GetCalendarData(ACellId: integer): TList<TCalendarModel>;
+    function GetClosedPeriods(ACellId: integer): TObjectList<TClosedPeriodModel>;
+    function GetCalendarData(ACellId: integer): TObjectList<TCalendarModel>;
     function GetWeekCalendar(ACalendarId: integer): TDictionary<integer, double>;
   end;
 
@@ -53,7 +57,7 @@ begin
   inherited;
 end;
 
-function TQueryHandler.GetCalendarData(ACellId: integer): TList<TCalendarModel>;
+function TQueryHandler.GetCalendarData(ACellId: integer): TObjectList<TCalendarModel>;
 var
   LCalendarId: TCalendarModel;
 begin
@@ -67,11 +71,11 @@ end;
 
 function TQueryHandler.GetCellsList: TList<integer>;
 begin
-  Result := PopulateCell<integer>(QUERY_CELLS, QueryUtilityHandler.QueryToCellsList);
+  Result := PopulateCellList(QUERY_CELLS, QueryUtilityHandler.QueryToCellsList);
 end;
 
 function TQueryHandler.GetClosedPeriods(
-  ACellId: integer): TList<TClosedPeriodModel>;
+  ACellId: integer): TObjectList<TClosedPeriodModel>;
 begin
   Result := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToClosedPeriods);
 end;
@@ -121,6 +125,8 @@ begin
 end;
 
 function TQueryHandler.PopulateCellModel(ACellId: integer): TCellDataModel;
+var
+  LObjPhases: TObjectList<TPhaseModel>;
 begin
   Result := TCellDataModel.Create;
   try
@@ -130,7 +136,12 @@ begin
 
     Result.TotalPartials := PopulateCell<TPartialModel>(Format(QUERY_TOTAL_PARTIALS, [intToStr(ACellId)]), QueryUtilityHandler.QueryToPartialsList);
 
-    Result.ProductionOrders := PopulateProductionOrders(PopulateCell<TPhaseModel>(Format(QUERY_PHASES ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToPhaseList));
+    LObjPhases := PopulateCell<TPhaseModel>(Format(QUERY_PHASES ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToPhaseList);
+    try
+      Result.ProductionOrders := PopulateProductionOrders(LObjPhases);
+    finally
+      LObjPhases.Free;
+    end;
 
     QueryUtilityHandler.WorkHoursSum(Result.ProductionOrders);
 
@@ -145,42 +156,57 @@ begin
 end;
 
 function TQueryHandler.PopulateProductionOrders(
-  APhases: TList<TPhaseModel>): TList<TProductionOrderModel>;
+  APhases: TObjectList<TPhaseModel>): TObjectList<TProductionOrderModel>;
 var
   LPhase: TPhaseModel;
   LProductionOrder: TProductionOrderModel;
-  I: Integer;
+
 begin
-  Result := TList<TProductionOrderModel>.Create;
+  LProductionOrder := nil;
+  APhases.OwnsObjects := False;
+
+  Result := TObjectList<TProductionOrderModel>.Create;
   try
-    try
-      for LPhase in APhases do
+    for LPhase in APhases do
+    begin
+      if ( LProductionOrder = nil ) or ( LPhase.POID <> LProductionOrder.POID ) then
       begin
-        if LPhase.POID <> LProductionOrder.POID then
-        begin
-          LProductionOrder := TProductionOrderModel.Create;
-          LProductionOrder.Phases := TList<TPhaseModel>.Create;
-          LProductionOrder.POID := LPhase.POID;
-          Result.Add(LProductionOrder);
-        end;
-        LProductionOrder.Phases.Add(LPhase);
+        LProductionOrder := TProductionOrderModel.Create;
+        LProductionOrder.Phases := TObjectList<TPhaseModel>.Create;
+        LProductionOrder.POID := LPhase.POID;
+        Result.Add(LProductionOrder);
       end;
-    except
-      Result.Free;
-      raise Exception.Create(PO_ERROR);
+
+      LProductionOrder.Phases.Add(LPhase);
     end;
-  finally
-    for I := 0 to APhases.Count-1 do
-      APhases[I].FreeInstance;
-    APhases.Free;
+  except
+    Result.Free;
+    raise Exception.Create(PO_ERROR);
   end;
 end;
 
 function TQueryHandler.PopulateCell<T>(const AQuery: string;
-  AFunc: TFunc<T>): TList<T>;
+  AFunc: TFunc<T>): TObjectList<T>;
 var
   LQuery: TADOQuery;
 begin
+  try
+    LQuery := QueryExecutor.ExecuteQuery(AQuery);
+    if LQuery <> nil then
+      Result := AFunc(LQuery)
+    else
+      raise Exception.Create(SQL_DATA_NOTFOUND);
+  finally
+    LQuery.Free;
+  end;
+end;
+
+function TQueryHandler.PopulateCellList(const AQuery: string;
+  AFunc: TFunctInt<integer>): TList<integer>;
+var
+  LQuery: TADOQuery;
+begin
+  LQuery := nil;
   try
     LQuery := QueryExecutor.ExecuteQuery(AQuery);
     if LQuery <> nil then

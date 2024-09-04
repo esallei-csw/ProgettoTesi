@@ -125,9 +125,15 @@ begin
 end;
 
 procedure TfrmPredictiveMaintenance.FreeResultList;
+var
+  LResult: TResultModel;
 begin
   if Assigned(FResultList) then
+  begin
+    for LResult in FResultList do
+      LResult.Free;
     FResultList.Free;
+  end;
 end;
 
 function TfrmPredictiveMaintenance.GetPredictiveMaintenance: IPredictiveMaintenance;
