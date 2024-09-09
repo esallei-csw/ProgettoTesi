@@ -10,18 +10,15 @@ type
 
   private
   {Private declarations}
-  FIDCelPro: integer;
   FIDCalendar: integer;
   FStartDay: Double;
   FHourDaily: TDictionary<integer, double>;
-
 
   public
   {Public declarations}
   constructor Create;
   destructor Destroy; override;
 
-  property IDCelPro: integer read FIDCelPro write FIDCelPro;
   property IDCalendar: integer read FIDCalendar write FIDCalendar;
   property StartDay: Double read FStartDay write FStartDay;
   property HourDaily: TDictionary<integer, double> read FHourDaily write FHourDaily;
@@ -34,7 +31,6 @@ implementation
 
 constructor TCalendarModel.Create;
 begin
-  FIDCelPro := varEmpty;
   FIDCalendar := varEmpty;
   FStartDay := varEmpty;
   FHourDaily := nil;

@@ -29,6 +29,8 @@ type
 implementation
 
 { ClosedPeriodModel }
+uses
+  System.SysUtils;
 
 constructor TClosedPeriodModel.Create;
 begin
@@ -36,7 +38,7 @@ begin
   FIDCell := varEmpty;
   FDataInizio := varEmpty;
   FDataFine := varEmpty;
-  FTipo := '';
+  FTipo := EmptyStr;
   FDuration := varEmpty;
 end;
 

@@ -13,6 +13,9 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
   OldCreateOrder = False
   OnCreate = FormCreate
   OnDestroy = FormDestroy
+  DesignSize = (
+    824
+    456)
   PixelsPerInch = 96
   TextHeight = 13
   object lblCellId: TLabel
@@ -34,6 +37,7 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
     Top = 208
     Width = 59
     Height = 13
+    Anchors = [akLeft, akBottom]
     Caption = 'Warning List'
   end
   object lblCells: TLabel
@@ -73,9 +77,18 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
     Top = 40
     Width = 609
     Height = 157
+    Anchors = [akLeft, akTop, akRight, akBottom]
     Columns = <
       item
         Caption = 'Cell ID'
+      end
+      item
+        Caption = 'Cell Code'
+        Width = 150
+      end
+      item
+        Caption = 'Cell Description'
+        Width = 150
       end
       item
         AutoSize = True
@@ -98,6 +111,7 @@ object frmPredictiveMaintenance: TfrmPredictiveMaintenance
     Top = 227
     Width = 609
     Height = 153
+    Anchors = [akLeft, akRight, akBottom]
     ItemHeight = 13
     TabOrder = 4
   end

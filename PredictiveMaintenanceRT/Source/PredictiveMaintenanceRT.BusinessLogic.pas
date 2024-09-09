@@ -44,6 +44,7 @@ begin
   LCellData := QueryHandler.PopulateCellModel(ACellId);
   try
     Result := PredictiveAlgorithm.CalculateMaintenanceDate(LCellData);
+
   finally
     LCellData.Free;
   end;

@@ -99,6 +99,7 @@ begin
       LResultList := nil;
       try
         LResultList := PredictiveMaintenance.GetMaintenanceDate(LCellID);
+        LResultList.OwnsObjects := false;
         for LResult in LResultList do
           FResultList.Add(LResult);
       finally
@@ -154,6 +155,8 @@ var
   LListItem: TListItem;
   LResultItem: TResultModel;
 begin
+  lblWarningList.Caption := 'Warning List';
+  lbWarningList.Clear;
   lvMaintenanceDates.Items.BeginUpdate;
   try
     lvMaintenanceDates.Items.Clear;
@@ -161,8 +164,10 @@ begin
     begin
       LListItem := lvMaintenanceDates.Items.Add;
       LListItem.Caption := IntToStr(LResultItem.CellID);
+      LListItem.SubItems.Add(LResultItem.CellCode);
+      LListItem.SubItems.Add(LResultItem.CellDescription);
       LListItem.SubItems.Add(LResultItem.Description);
-      LListItem.subitems.add(DateTimeToStr(FloatToDateTime(LResultItem.MaintenanceDate)));
+      LListItem.subitems.add(FormatDateTime('dd/mm/yyyy', LResultItem.MaintenanceDate));
       LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
     end;
   finally

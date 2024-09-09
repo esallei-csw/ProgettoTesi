@@ -1,0 +1,173 @@
+unit PredictiveMaintenance.main;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, PredictiveMaintenanceRT.BusinessLogicInterface,
+  {PredictiveMaintenanceRT.BusinessLogic,} Vcl.ComCtrls, PredictiveMaintenanceRT.ResultModel
+  , System.Generics.Collections;
+
+type
+  TfrmPredictiveMaintenance = class(TForm)
+    edtCellId: TEdit;
+    lblCellId: TLabel;
+    btnGetMaintenanceDate: TButton;
+    lblMaintenanceDate: TLabel;
+    cbUsePastData: TCheckBox;
+    lvMaintenanceDates: TListView;
+    lbWarningList: TListBox;
+    lblWarningList: TLabel;
+    lbCellsList: TListBox;
+    lblCells: TLabel;
+    btnGetCellsList: TButton;
+    btnGetMaintenanceDates: TButton;
+    procedure btnGetMaintenanceDateClick(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+    procedure lvMaintenanceDatesSelectItem(Sender: TObject; Item: TListItem; Selected: Boolean);
+    procedure btnGetCellsListClick(Sender: TObject);
+    procedure btnGetMaintenanceDatesClick(Sender: TObject);
+  private
+    { Private declarations }
+    FResultList: TObjectList<TResultModel>;
+    FPredictiveMaintenance: IPredictiveMaintenance;
+
+    procedure FreeResultList;
+    procedure UpdateMDList;
+    function GetPredictiveMaintenance: IPredictiveMaintenance;
+    property PredictiveMaintenance: IPredictiveMaintenance read GetPredictiveMaintenance write FPredictiveMaintenance;
+  public
+    { Public declarations }
+  end;
+
+var
+  frmPredictiveMaintenance: TfrmPredictiveMaintenance;
+
+implementation
+
+{$R *.dfm}
+
+uses
+  PredictiveMaintenanceRT.Constants, PredictiveMaintenanceRT.Messages, PredictiveMaintenanceRT.Factory;
+
+procedure TfrmPredictiveMaintenance.btnGetCellsListClick(Sender: TObject);
+var
+  LCellId: integer;
+  LCellsList: TList<integer>;
+begin
+  LCellsList := nil;
+  try
+    lbCellsList.Items.Clear;
+    LCellsList := PredictiveMaintenance.GetCellsList;
+    for LCellId in LCellsList do
+      lbCellsList.Items.Add(IntToStr(LCellId));
+  finally
+    LCellsList.Free;
+  end;
+end;
+
+procedure TfrmPredictiveMaintenance.btnGetMaintenanceDateClick(Sender: TObject);
+begin
+  PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
+
+  FreeResultList;
+
+  FResultList := PredictiveMaintenance.GetMaintenanceDate(StrToInt(edtCellId.Text));
+
+  UpdateMDList;
+end;
+
+procedure TfrmPredictiveMaintenance.btnGetMaintenanceDatesClick(
+  Sender: TObject);
+var
+  LCellID: integer;
+  LCellsID: TList<integer>;
+  LResultList: TObjectList<TResultModel>;
+  LResult: TResultModel;
+begin
+  PredictiveMaintenance.UsePastData(cbUsePastData.Checked);
+
+  FreeResultList;
+
+  FResultList := TObjectList<TResultModel>.Create;
+
+  LCellsID := PredictiveMaintenance.GetCellsList;
+  try
+    for LCellID in LCellsID do
+    begin
+      LResultList := nil;
+      try
+        LResultList := PredictiveMaintenance.GetMaintenanceDate(LCellID);
+        LResultList.OwnsObjects := false;
+        for LResult in LResultList do
+          FResultList.Add(LResult);
+      finally
+        LResultList.Free;
+      end;
+    end;
+  finally
+    LCellsID.Free;
+  end;
+  UpdateMDList;
+end;
+
+procedure TfrmPredictiveMaintenance.FormCreate(Sender: TObject);
+begin
+  edtCellId.Text := inttostr(DEFAULT_CELLID);
+  FPredictiveMaintenance := nil;
+end;
+
+procedure TfrmPredictiveMaintenance.FormDestroy(Sender: TObject);
+begin
+  FreeResultList;
+
+  inherited;
+end;
+
+procedure TfrmPredictiveMaintenance.FreeResultList;
+begin
+  if Assigned(FResultList) then
+    FResultList.Free;
+end;
+
+function TfrmPredictiveMaintenance.GetPredictiveMaintenance: IPredictiveMaintenance;
+begin
+  if not Assigned(FPredictiveMaintenance) then
+    FPredictiveMaintenance := TPredictiveMaintenanceFactory.New.objPredictiveMaintenance;
+
+  Result := FPredictiveMaintenance;
+end;
+
+procedure TfrmPredictiveMaintenance.lvMaintenanceDatesSelectItem(
+  Sender: TObject; Item: TListItem; Selected: Boolean);
+var
+  LWarningString: string;
+begin
+  lblWarningList.Caption := WARNINGLIST + FResultList[item.Index].Description;
+  lbWarningList.Items.Clear;
+  for LWarningString in FResultList[Item.Index].WarningList do
+    lbWarningList.Items.Add(LWarningString);
+end;
+
+procedure TfrmPredictiveMaintenance.UpdateMDList;
+var
+  LListItem: TListItem;
+  LResultItem: TResultModel;
+begin
+  lvMaintenanceDates.Items.BeginUpdate;
+  try
+    lvMaintenanceDates.Items.Clear;
+    for LResultItem in FResultList do
+    begin
+      LListItem := lvMaintenanceDates.Items.Add;
+      LListItem.Caption := IntToStr(LResultItem.CellID);
+      LListItem.SubItems.Add(LResultItem.Description);
+      LListItem.subitems.add(FormatDateTime('dd/mm/yyyy', LResultItem.MaintenanceDate));
+      LListItem.SubItems.Add(FloatToStr(LResultItem.Percent));
+    end;
+  finally
+    lvMaintenanceDates.Items.EndUpdate;
+  end;
+end;
+end.

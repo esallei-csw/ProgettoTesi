@@ -52,6 +52,9 @@ const
   CALENDAR_TOTORE = 'TotInOre';
   CALENDAR_STARTDAY = 'GGINIZIO';
   GIORNO = 'GIORNO';
+  CODICE = 'Codice';
+  DESCRIZIONE = 'Descr';
+  ID_REPARTO ='IdRepCdC';
 
   CONNECTION_STRING = 'Provider=SQLOLEDB.1;' +
                       'Persist Security Info=False;' +
@@ -89,23 +92,36 @@ const
 
   QUERY_CLOSEDPERIOD = 'select ID, IDCELPRO, DATINI, DATFIN, TIPO, DURATA '+
                         'from TAPCCF '+
-                        'where (IDCELPRO = %s) or (TIPO = ''SA'') or (TIPO = ''SR'')';
+                        'where (IDCELPRO = %s) or (TIPO = ''SA'') or ((TIPO = ''SR'') and (IDREPCDC=%s))';
 
   QUERY_MACHINESTOPS = 'select ID, IDCELPRO, DATIN, ORAIN*24 as OraInizio, DATFI, ORAFI*24 as OraFine, DUR*24 as DurataInOre '+
                         'from ALLARMI '+
                         'where IDCELPRO = %s and APERTO = 0';
 
-  QUERY_CALENDAR = 'select PROFASS.IDPROFTES, PROFASS.IDCELPRO, PROFASS.GGINIZIO ' +
+  QUERY_CALENDAR = 'select PROFASS.IDPROFTES, PROFASS.GGINIZIO ' +
                     'from PROFASS ' +
                       'join PROFTES on PROFTES.ID = PROFASS.IDPROFTES '+
-                    'where PROFASS.IDCELPRO = %s '+
+                    'where (PROFASS.IDCELPRO = %s) and (PROFASS.TIPO=''C'') '+
+                    'order by GGINIZIO ';
+
+  QUERY_CALENDAR_DEPARTMENT = 'select PROFASS.IDPROFTES, PROFASS.GGINIZIO ' +
+                    'from PROFASS ' +
+                      'join PROFTES on PROFTES.ID = PROFASS.IDPROFTES '+
+                    'where (PROFASS.IDREPCDC = %s) and (PROFASS.TIPO=''R'') '+
+                    'order by GGINIZIO ';
+
+  QUERY_CALENDAR_PLANT = 'select PROFASS.IDPROFTES, PROFASS.GGINIZIO ' +
+                    'from PROFASS ' +
+                      'join PROFTES on PROFTES.ID = PROFASS.IDPROFTES '+
+                    'where (PROFASS.TIPO=''A'') '+
                     'order by GGINIZIO ';
 
   QUERY_WEEK_CALENDAR = 'select GIORNO, TOTORE*24 as TotInOre '+
                         'from PROFDET '+
                         'where IDPROFTES = %s and VARIANTE	= ''0000''';
 
-
+  QUERY_GETREPCDC_FROMCELPRO = 'select IdRepCdC from CelPro where (ID=%s) ';
+  QUERY_GETCELPRO_INFO = 'select Codice, Descr from CelPro where (ID=%s) ';
 
 implementation
 

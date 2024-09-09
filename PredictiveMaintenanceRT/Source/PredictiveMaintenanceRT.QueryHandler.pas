@@ -29,6 +29,9 @@ type
     function GetQueryExecutor: TQueryExecutor;
     property QueryExecutor: TQueryExecutor read GetQueryExecutor write FQueryExecutor;
 
+    function GetRepCdCId(ACelProId: integer): integer;
+    procedure GetCellInfo(ACelProId: integer; out ACode: String; out ADescription: string);
+
     function GetQueryUtilityHandler: TQueryUtilityHandler;
     property QueryUtilityHandler: TQueryUtilityHandler read GetQueryUtilityHandler write FQueryUtilityHandler;
 
@@ -63,9 +66,41 @@ var
 begin
   //get Calendars
   Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToCalendars);
+  if ( Result.Count = 0 ) then
+  begin
+    FreeAndNil(Result);
+
+    var LRepCdCId: integer;
+    LRepCdCID := GetRepCdCId(ACellId);
+    Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR_DEPARTMENT,[IntToStr(LRepCdCID)]), QueryUtilityHandler.QueryToCalendars);
+    if ( Result.Count = 0 ) then
+    begin
+      FreeAndNil(Result);
+      Result := PopulateCell<TCalendarModel>(Format(QUERY_CALENDAR_PLANT,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToCalendars);
+
+      if ( Result.Count = 0 ) then
+        Exit;
+    end;
+  end;
+
   //populate week calendar for each calendar found
   for LCalendarId in Result do
     LCalendarId.HourDaily := GetWeekCalendar(LCalendarId.IDCalendar);
+
+end;
+
+procedure TQueryHandler.GetCellInfo(ACelProId: integer; out ACode,
+  ADescription: string);
+var
+  LQrySel: TADOQuery;
+begin
+  LQrySel := QueryExecutor.ExecuteQuery(Format(QUERY_GETCELPRO_INFO, [IntToStr(ACelProId)]));
+  try
+    ACode := LQrySel.FieldByName(CODICE).asString;
+    ADescription := LQrySel.FieldByName(DESCRIZIONE).asString;
+  finally
+    LQrySel.Free;
+  end;
 
 end;
 
@@ -77,7 +112,7 @@ end;
 function TQueryHandler.GetClosedPeriods(
   ACellId: integer): TObjectList<TClosedPeriodModel>;
 begin
-  Result := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToClosedPeriods);
+  Result := PopulateCell<TClosedPeriodModel>(Format(QUERY_CLOSEDPERIOD,[IntToStr(ACellId), IntToStr(GetRepCdCId(ACellId))]), QueryUtilityHandler.QueryToClosedPeriods);
 end;
 
 function TQueryHandler.GetQueryExecutor: TQueryExecutor;
@@ -92,6 +127,20 @@ begin
   if not Assigned(FQueryUtilityHandler) then
     FQueryUtilityHandler := TQueryUtilityHandler.Create;
   Result := FQueryUtilityHandler;
+end;
+
+function TQueryHandler.GetRepCdCId(ACelProId: integer): integer;
+var
+  LQrySel: TADOQuery;
+begin
+  LQrySel := QueryExecutor.ExecuteQuery(Format(QUERY_GETREPCDC_FROMCELPRO, [IntToStr(ACelProId)]));
+  try
+    Result := LQrySel.FieldByName(ID_REPARTO).asInteger;
+  finally
+    LQrySel.Free;
+  end;
+
+
 end;
 
 function TQueryHandler.GetWeekCalendar(ACalendarId: integer): TDictionary<integer, double>;
@@ -127,10 +176,17 @@ end;
 function TQueryHandler.PopulateCellModel(ACellId: integer): TCellDataModel;
 var
   LObjPhases: TObjectList<TPhaseModel>;
+  LCode: string;
+  LDescription: string;
 begin
   Result := TCellDataModel.Create;
   try
     Result.CellId := ACellId;
+
+    GetCellInfo(Result.CellId, LCode, LDescription);
+
+    Result.CellCode := LCode;
+    Result.CellDescription := LDescription;
 
     Result.MaintenanceData := PopulateCell<TMaintenanceModel>(Format(QUERY_MAINTENANCE ,[IntToStr(ACellId)]), QueryUtilityHandler.QueryToMaintenanceData);
 
@@ -189,6 +245,8 @@ function TQueryHandler.PopulateCell<T>(const AQuery: string;
   AFunc: TFunc<T>): TObjectList<T>;
 var
   LQuery: TADOQuery;
+
+  LObj: T;
 begin
   try
     LQuery := QueryExecutor.ExecuteQuery(AQuery);

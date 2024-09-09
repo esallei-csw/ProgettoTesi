@@ -44,12 +44,13 @@ begin
     if not AQuery.Active then
       raise Exception.Create(DATASET_CLOSED);
     AQuery.First;
+
     while not AQuery.Eof do
     begin
       LDay := TCalendarModel.Create;
-      LDay.IDCelPro := AQuery.FieldByName(IDCELPRO).AsInteger;
       LDay.IDCalendar := AQuery.FieldByName(CALENDAR_ID).AsInteger;
       LDay.StartDay := AQuery.FieldByName(CALENDAR_STARTDAY).AsFloat;
+
       Result.Add(LDay);
       AQuery.Next;
     end;

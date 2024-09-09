@@ -31,9 +31,12 @@ implementation
 
 { TMaintenanceModel }
 
+uses
+  System.SysUtils;
+
 constructor TMaintenanceModel.Create;
 begin
-  FDescription := '';
+  FDescription := EmptyStr;
   FThresholdPieces := varEmpty;
   FThresholdHoursWorked := varEmpty;
   FThresholdDays := varEmpty;

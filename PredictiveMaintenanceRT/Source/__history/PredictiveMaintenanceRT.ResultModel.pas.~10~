@@ -1,0 +1,66 @@
+unit PredictiveMaintenanceRT.ResultModel;
+
+interface
+
+uses
+  System.Generics.Collections;
+
+type
+  TCellInfo = record
+    id: integer;
+    Code: string;
+    Description: string;
+  end;
+
+
+  TResultModel = class
+
+    private
+    {Private declarations}
+    FCell: TCellInfo;
+    FDescription: string;
+    FMaintenanceDate: Double;
+    FPercent: Double;
+    FWarningList: TList<string>;
+    procedure EmptyCellInfo;
+    public
+    {Public declarations}
+    constructor Create;
+    destructor Destroy; override;
+    property Cell: TCellInfo read FCell write FCell;
+
+    property Description: string read FDescription write FDescription;
+    property MaintenanceDate: Double read FMaintenanceDate write FMaintenanceDate;
+    property Percent: Double read FPercent write FPercent;
+    property WarningList: TList<string> read FWarningList write FWarningList;
+  end;
+
+implementation
+
+uses
+  System.SysUtils;
+
+{ TResultModel }
+
+constructor TResultModel.Create;
+begin
+  FDescription := EmptyStr;
+  FMaintenanceDate := varEmpty;
+  FPercent := varEmpty;
+  FWarningList := TList<string>.Create;
+end;
+
+destructor TResultModel.Destroy;
+begin
+  FWarningList.Free;
+  inherited;
+end;
+
+procedure TResultModel.EmptyCellInfo;
+begin
+  FCell.id := varEmpty;
+  FCell.Code := EmptyStr;
+  FCell.Description := EmptyStr;
+end;
+
+end.

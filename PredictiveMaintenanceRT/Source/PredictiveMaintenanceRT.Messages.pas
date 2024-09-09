@@ -11,7 +11,6 @@ resourcestring
   DATASET_CLOSED = 'Dataset is not open.';
   SQL_ERROR = 'SQL Error';
 
-  MAINTENANCE_BEFORE_NOW = 'Attenzione, la manutenzione dovrebbe già essere stata fattam procedere alla manutenzione il prima possibile o aggiornare la data di ultima manutenzione';
   VALUE_ZERO = 'Errore nel calcolo: valore = 0';
 
   FINISHED_PO = 'Finiti gli ordini di produzione';
@@ -28,7 +27,7 @@ resourcestring
   ACTUALLY_USED_PAST_DATA = 'PastData actually used for PO n°';
   MAN_STRA = 'Data ultima manutenzione = 0';
   CELL_DATA_NIL = 'Cella Data Nil';
-  MAINTENANCE_TODO_MSG = 'Data di manutenzione precedente alla data di oggi, la manutenzione deve essere fatta il prima possibile!';
+  MAINTENANCE_TODO_MSG = 'Maintenance date is before today, maintenance is due as soon as possible!';
 
 implementation
 

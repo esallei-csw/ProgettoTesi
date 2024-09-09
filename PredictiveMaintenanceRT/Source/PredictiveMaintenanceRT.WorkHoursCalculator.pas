@@ -78,7 +78,7 @@ end;
 
 function TWorkHoursCalculator.IsHoliday(const ADate: Double): Boolean;
 begin
-  Result := FHolidayList.Contains(ADate);
+  Result := FHolidayList.Contains(Trunc(ADate));
 end;
 
 function TWorkHoursCalculator.GetCalendarWeek(ADate: Double): Double;
