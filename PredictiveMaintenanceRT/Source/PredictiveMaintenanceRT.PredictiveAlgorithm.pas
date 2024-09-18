@@ -337,6 +337,9 @@ begin
       Result[LIndex].CellCode := ACell.CellCode;
       Result[LIndex].CellDescription := ACell.CellDescription;
 
+      if Result[LIndex].Percent > 100 then
+        Result[LIndex].Percent := 100;
+
       if Result[LIndex].MaintenanceDate < now then
         Result[LIndex].WarningList.Add(MAINTENANCE_TODO_MSG);
     end;
